@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Grayvolt — 4×4×1 Mailer Dielines</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <style>
+    :root {
+      --bg: #1a1a1d;
+      --bg-panel: #232327;
+      --border: #333338;
+      --text: #e8e8ec;
+      --text-dim: #8b8b96;
+      --text-muted: #5a5a65;
+      --accent: #c8ff00;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      min-height: 100%;
+    }
+    body { padding: 40px 28px 80px; }
+
+    .page-header {
+      max-width: 1400px;
+      margin: 0 auto 36px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header h1 {
+      font-family: 'Outfit', system-ui, sans-serif;
+      font-weight: 800; font-size: 32px; letter-spacing: -1px;
+    }
+    .page-header h1 .accent { color: var(--accent); }
+    .page-header p {
+      font-size: 14px; color: var(--text-dim); max-width: 560px; line-height: 1.6;
+    }
+    .page-header .eyebrow {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      text-transform: uppercase; letter-spacing: 2px; color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .mailer-stack {
+      max-width: 1400px; margin: 0 auto;
+      display: flex; flex-direction: column; gap: 48px;
+    }
+    .mailer-card {
+      background: var(--bg-panel); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .mailer-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 28px; border-bottom: 1px solid var(--border);
+      gap: 16px; flex-wrap: wrap;
+    }
+    .mailer-title {
+      font-family: 'Outfit', system-ui, sans-serif;
+      font-weight: 700; font-size: 20px; letter-spacing: -0.5px;
+      display: flex; align-items: baseline; gap: 12px;
+    }
+    .mailer-title .sku {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      color: var(--accent); letter-spacing: 1.5px;
+      padding: 3px 8px; border: 1px solid var(--accent); border-radius: 3px;
+    }
+    .mailer-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      padding: 9px 14px; border: 1px solid var(--border);
+      background: transparent; color: var(--text);
+      border-radius: 6px; cursor: pointer; transition: all 0.2s ease-out;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn.primary {
+      background: var(--accent); color: #0a0a0b;
+      border-color: var(--accent); font-weight: 500;
+    }
+    .btn.primary:hover {
+      color: #0a0a0b;
+      box-shadow: 0 6px 20px rgba(200,255,0,0.25); transform: translateY(-1px);
+    }
+
+    .dieline-wrap {
+      padding: 28px;
+      background:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px) 0 0 / 20px 20px,
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px) 0 0 / 20px 20px,
+        #111114;
+      display: flex; justify-content: center; overflow: auto;
+    }
+    .dieline-wrap svg {
+      width: 100%; max-width: 1320px; height: auto;
+      image-rendering: -webkit-optimize-contrast;
+      filter: drop-shadow(0 20px 40px rgba(0,0,0,0.45));
+    }
+
+    .panel-exports {
+      padding: 20px 28px; border-top: 1px solid var(--border);
+      background: #1c1c1f;
+    }
+    .panel-exports h4 {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--accent); margin-bottom: 14px;
+    }
+    .panel-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    .panel-btn {
+      display: flex; flex-direction: column; gap: 2px;
+      padding: 12px 14px; text-align: left;
+      background: #0f0f11; border: 1px solid var(--border);
+      border-radius: 6px; cursor: pointer;
+      transition: all 0.2s ease-out;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .panel-btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .panel-btn .label {
+      font-size: 13px; color: var(--text); font-weight: 500;
+    }
+    .panel-btn .size {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      color: var(--text-muted); letter-spacing: 0.5px;
+    }
+    .panel-btn .action {
+      font-family: 'JetBrains Mono', monospace; font-size: 9px;
+      color: var(--accent); letter-spacing: 1.5px;
+      text-transform: uppercase; margin-top: 4px;
+    }
+
+    #tweaks-panel {
+      position: fixed; bottom: 20px; right: 20px;
+      background: rgba(10,10,11,0.92); backdrop-filter: blur(20px);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 18px 20px; width: 260px; z-index: 100;
+      display: none; font-family: 'DM Sans', sans-serif;
+    }
+    #tweaks-panel.active { display: block; }
+    #tweaks-panel h3 {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      text-transform: uppercase; letter-spacing: 2px;
+      color: var(--accent); margin-bottom: 14px;
+    }
+    .tweak-row { margin-bottom: 14px; }
+    .tweak-row label {
+      display: block; font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-dim); margin-bottom: 6px;
+    }
+    .tweak-row select, .tweak-row input[type=text] {
+      width: 100%; background: #0a0a0b; color: var(--text);
+      border: 1px solid var(--border); padding: 8px 10px;
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      border-radius: 6px;
+    }
+    .legend {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      color: var(--text-muted); padding: 14px 28px;
+      border-top: 1px solid var(--border);
+      display: flex; gap: 20px; flex-wrap: wrap;
+    }
+    .legend span::before {
+      content: ''; display: inline-block;
+      width: 14px; height: 2px; margin-right: 6px; vertical-align: middle;
+    }
+    .legend .crease::before { background: repeating-linear-gradient(90deg, #ff4d6a 0 3px, transparent 3px 6px); }
+    .legend .cut::before { background: #ff4d6a; }
+    .legend .gs1::before { background: #fff; border: 1px dashed var(--accent); }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <div>
+      <div class="eyebrow">GRAYVOLT · PACKAGING</div>
+      <h1>4×4×1 mailer <span class="accent">dielines.</span></h1>
+      <p style="margin-top:10px">Flat print-ready artwork for both SKUs, matching the supplied die (back strip + top face + depth sides + front hero + tuck flap). Regulatory lives on the bottom face (tray); apply your GS1 label where it fits at packout. FRONT face (the customer-facing panel). Export the full dieline or any individual panel as a 300 DPI PNG.</p>
+    </div>
+    <div style="text-align:right">
+      <div class="eyebrow">DIE</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);margin-top:4px">
+        10 × 9.75 in · 1:1 @ 100 px/in<br/>
+        Tapered dust flaps · insert slots
+      </div>
+    </div>
+  </header>
+
+  <div class="mailer-stack" id="mailer-stack"></div>
+
+  <div id="tweaks-panel">
+    <h3>Tweaks</h3>
+    <div class="tweak-row">
+      <label>Background</label>
+      <select id="tw-bg">
+        <option value="#0a0a0b">Near-black (brand)</option>
+        <option value="#131316">Elevated</option>
+        <option value="#1a1a1f">Charcoal</option>
+      </select>
+    </div>
+    <div class="tweak-row">
+      <label>Accent style — Analyzer</label>
+      <select id="tw-accent-analyzer">
+        <option value="spectrum">Spectrum bars</option>
+        <option value="waveform">Waveform</option>
+      </select>
+    </div>
+    <div class="tweak-row">
+      <label>Accent style — Balancer</label>
+      <select id="tw-accent-balancer">
+        <option value="waveform">Waveform</option>
+        <option value="spectrum">Spectrum bars</option>
+      </select>
+    </div>
+    <div class="tweak-row">
+      <label>FCC ID (optional)</label>
+      <input type="text" id="tw-fcc" placeholder="e.g. 2AXXXX-GV01" />
+    </div>
+    <div class="tweak-row">
+      <label>Reference overlay</label>
+      <select id="tw-overlay">
+        <option value="off">Off</option>
+        <option value="on">Show die reference (50%)</option>
+      </select>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/html-to-image@1.11.11/dist/html-to-image.js"></script>
+
+  <script type="text/babel">
+    // Product data — inlined to avoid caching issues
+    window.PRODUCTS = {
+      analyzer: {
+        key: 'analyzer',
+        name: 'Vibration Analyzer',
+        sku: 'GV-VA-01',
+        modelFull: 'GV-VA-01 · Vibration Analyzer',
+        tagline: 'REAL-TIME FFT SPECTRUM · NO LAPTOP REQUIRED',
+        fcc: '',
+        connect: [
+          { n: '01', title: 'Mount',   body: 'Magnet sensor to machine housing near bearing.' },
+          { n: '02', title: 'Power',   body: 'Plug USB-C. LED pulses amber.' },
+          { n: '03', title: 'Pair',    body: 'Join "GV-XXXX" WiFi. Open GV-XXXX.local.' },
+          { n: '04', title: 'Measure', body: 'Live FFT in-browser. No laptop needed.' },
+        ],
+      },
+      balancer: {
+        key: 'balancer',
+        name: 'Spindle Balancer',
+        sku: 'GV-SB-01',
+        modelFull: 'GV-SB-01 · Spindle Balancer',
+        tagline: 'AUTO-BALANCING · UP TO 60,000 RPM',
+        fcc: '',
+        connect: [
+          { n: '01', title: 'Mount',   body: 'Magnet to spindle housing. Apply tape to shaft.' },
+          { n: '02', title: 'Power',   body: 'Plug USB-C. LED pulses amber.' },
+          { n: '03', title: 'Pair',    body: 'Join "GV-XXXX" WiFi. Open GV-XXXX.local.' },
+          { n: '04', title: 'Balance', body: 'Run auto-balance. < 5 min per plane.' },
+        ],
+      },
+    };
+  </script>
+  <script type="text/babel" src="mailer/Dieline.jsx"></script>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    const DEFAULTS = /*EDITMODE-BEGIN*/{
+      "background": "#0a0a0b",
+      "accentAnalyzer": "spectrum",
+      "accentBalancer": "spectrum",
+      "fccId": "",
+      "overlay": "off"
+    }/*EDITMODE-END*/;
+
+    async function inlineImagesInSvg(svgEl) {
+      const imgs = svgEl.querySelectorAll('image');
+      for (const img of imgs) {
+        const href = img.getAttribute('href') || img.getAttribute('xlink:href');
+        if (!href || href.startsWith('data:')) continue;
+        try {
+          const resp = await fetch(href);
+          const blob = await resp.blob();
+          const dataUrl = await new Promise(res => {
+            const r = new FileReader();
+            r.onload = () => res(r.result);
+            r.readAsDataURL(blob);
+          });
+          img.setAttribute('href', dataUrl);
+          img.removeAttribute('xlink:href');
+        } catch (e) { console.warn('inline failed', href, e); }
+      }
+    }
+
+    async function rasterizeSvgToPng(svgEl, filename, dpi = 300) {
+      const vb = svgEl.viewBox.baseVal;
+      const w = vb.width || svgEl.width.baseVal.value;
+      const h = vb.height || svgEl.height.baseVal.value;
+      const scale = dpi / 100;
+
+      // Clone and inline external images as data URLs
+      const clone = svgEl.cloneNode(true);
+      clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      clone.setAttribute('width', w);
+      clone.setAttribute('height', h);
+      await inlineImagesInSvg(clone);
+
+      const xml = new XMLSerializer().serializeToString(clone);
+      const svgBlob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+      try {
+        const img = new Image();
+        await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+        const canvas = document.createElement('canvas');
+        canvas.width = w * scale; canvas.height = h * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(scale, scale);
+        ctx.drawImage(img, 0, 0);
+        const pngBlob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+        if (!pngBlob) throw new Error('toBlob returned null');
+        const a = document.createElement('a');
+        a.download = filename;
+        a.href = URL.createObjectURL(pngBlob);
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    async function exportFullDieline(svgEl, filename) {
+      await rasterizeSvgToPng(svgEl, filename, 300);
+    }
+
+    function exportPanel(panelKey, product, accentStyle, productImage, bgColor, filename) {
+      // Render offscreen into a hidden div, get its <svg>, rasterize, cleanup.
+      const host = document.createElement('div');
+      host.style.position = 'fixed';
+      host.style.left = '-9999px';
+      host.style.top = '0';
+      document.body.appendChild(host);
+      const root = ReactDOM.createRoot(host);
+      root.render(
+        <Dieline panelId={panelKey} product={product} accentStyle={accentStyle}
+                 productImage={productImage} bgColor={bgColor} />
+      );
+      setTimeout(async () => {
+        const svg = host.querySelector('svg');
+        if (svg) {
+          await rasterizeSvgToPng(svg, filename, 300);
+        }
+        setTimeout(() => { root.unmount(); host.remove(); }, 500);
+      }, 300);
+    }
+
+    function MailerCard({ product, accentStyle, productImage, fccOverride, bgColor, overlay }) {
+      const svgContainerRef = useRef(null);
+      const productWithFcc = { ...product, fcc: fccOverride || product.fcc };
+
+      const handleExportFull = async () => {
+        const svg = svgContainerRef.current.querySelector('svg');
+        if (svg) await exportFullDieline(svg, `grayvolt-mailer-${product.key}-full.png`);
+      };
+
+      const handleExportPanel = (panelKey, label) => {
+        const slug = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        exportPanel(panelKey, productWithFcc, accentStyle, productImage, bgColor,
+          `grayvolt-${product.key}-${slug}.png`);
+      };
+
+      return (
+        <div className="mailer-card">
+          <div className="mailer-head">
+            <div className="mailer-title">
+              <span>{product.name}</span>
+              <span className="sku">{product.sku}</span>
+            </div>
+            <div className="mailer-actions">
+              <button className="btn primary" onClick={handleExportFull}>Export full dieline →</button>
+            </div>
+          </div>
+          <div className="dieline-wrap" ref={svgContainerRef}>
+            <Dieline
+              product={productWithFcc}
+              accentStyle={accentStyle}
+              productImage={productImage}
+              bgColor={bgColor}
+              showAnnotations={true}
+              showReferenceOverlay={overlay}
+            />
+          </div>
+          <div className="legend">
+            <span className="crease">Crease</span>
+            <span className="cut">Cut line</span>
+            <span style={{marginLeft:'auto',color:'var(--text-muted)'}}>
+              Print area · 10 × 9.75 in
+            </span>
+          </div>
+          <div className="panel-exports">
+            <h4>Export individual panels</h4>
+            <div className="panel-grid">
+              {EXPORTABLE_PANELS.map(p => (
+                <button key={p.key} className="panel-btn"
+                        onClick={() => handleExportPanel(p.key, p.label)}>
+                  <span className="label">{p.label}</span>
+                  <span className="size">{p.size}</span>
+                  <span className="action">Download PNG →</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [bg, setBg] = useState(DEFAULTS.background);
+      const [accentA, setAccentA] = useState(DEFAULTS.accentAnalyzer);
+      const [accentB, setAccentB] = useState(DEFAULTS.accentBalancer);
+      const [fcc, setFcc] = useState(DEFAULTS.fccId);
+      const [overlay, setOverlay] = useState(DEFAULTS.overlay);
+
+      useEffect(() => {
+        const onMsg = (e) => {
+          if (e.data?.type === '__activate_edit_mode') {
+            document.getElementById('tweaks-panel').classList.add('active');
+          } else if (e.data?.type === '__deactivate_edit_mode') {
+            document.getElementById('tweaks-panel').classList.remove('active');
+          }
+        };
+        window.addEventListener('message', onMsg);
+        window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+
+        const bgEl = document.getElementById('tw-bg');
+        const aaEl = document.getElementById('tw-accent-analyzer');
+        const abEl = document.getElementById('tw-accent-balancer');
+        const fccEl = document.getElementById('tw-fcc');
+        const ovEl = document.getElementById('tw-overlay');
+        bgEl.value = bg; aaEl.value = accentA; abEl.value = accentB; fccEl.value = fcc; ovEl.value = overlay;
+
+        const push = (key, value) => {
+          window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [key]: value } }, '*');
+        };
+        bgEl.onchange = (e) => { setBg(e.target.value); push('background', e.target.value); };
+        aaEl.onchange = (e) => { setAccentA(e.target.value); push('accentAnalyzer', e.target.value); };
+        abEl.onchange = (e) => { setAccentB(e.target.value); push('accentBalancer', e.target.value); };
+        fccEl.oninput = (e) => { setFcc(e.target.value); push('fccId', e.target.value); };
+        ovEl.onchange = (e) => { setOverlay(e.target.value); push('overlay', e.target.value); };
+
+        return () => window.removeEventListener('message', onMsg);
+      }, []);
+
+      return (
+        <>
+          <MailerCard
+            key={`analyzer-${bg}-${accentA}-${overlay}`}
+            product={PRODUCTS.analyzer}
+            accentStyle={accentA}
+            productImage="assets/product-iso.png"
+            fccOverride={fcc}
+            bgColor={bg}
+            overlay={overlay === 'on'}
+          />
+          <MailerCard
+            key={`balancer-${bg}-${accentB}-${overlay}`}
+            product={PRODUCTS.balancer}
+            accentStyle={accentB}
+            productImage="assets/product-iso-clear.png"
+            fccOverride={fcc}
+            bgColor={bg}
+            overlay={overlay === 'on'}
+          />
+        </>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('mailer-stack'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
