@@ -1,4 +1,5 @@
 import type { Product } from './products';
+import { FnskuLabel } from './FnskuLabel';
 
 /* Dieline — 4×4×1 mailer, calibrated against reference image.
    Total die: 9.88" × 11.81". Scale: 100 px = 1 inch. */
@@ -237,6 +238,16 @@ function TopFace({ w, h, product, accentStyle, productImage }: { w: number; h: n
 function BotFace({ w, h, product }: { w: number; h: number; product: Product }) {
   const pad = 22;
   const steps = product.connect ?? [];
+  const hasBarcode = product.barcode?.enabled;
+
+  // When a barcode label is enabled we cap connect-step body lines to 3 so
+  // the label fits between the steps and the footer without overlap.
+  const maxBodyLines = hasBarcode ? 3 : 5;
+
+  const labelW = Math.min(w - pad * 2, 200);
+  const labelH = 84;
+  const labelX = (w - labelW) / 2;
+  const labelY = h - pad - 62 - labelH - 8;
 
   return (
     <>
@@ -262,13 +273,24 @@ function BotFace({ w, h, product }: { w: number; h: number; product: Product }) 
               <text x={0} y={20} fill={c.accent} fontFamily={FONT_DISPLAY} fontSize="30" fontWeight="800" letterSpacing="-1.5">{s.n}</text>
               <line x1={0} y1={32} x2={36} y2={32} stroke={c.accent} strokeWidth="1.5" />
               <text x={0} y={54} fill={c.text} fontFamily={FONT_DISPLAY} fontSize="13" fontWeight="700" letterSpacing="-0.3">{s.title}</text>
-              {lines.slice(0, 5).map((ln, j) => (
+              {lines.slice(0, maxBodyLines).map((ln, j) => (
                 <text key={j} x="0" y={72 + j * 12} fill={c.textDim} fontFamily={FONT_BODY} fontSize="9.5">{ln}</text>
               ))}
             </g>
           );
         })}
       </g>
+
+      {hasBarcode && (
+        <FnskuLabel
+          x={labelX}
+          y={labelY}
+          w={labelW}
+          h={labelH}
+          barcode={product.barcode}
+          fallbackTitle={product.name}
+        />
+      )}
 
       <g transform={`translate(0, ${h - pad - 62})`}>
         <line x1={pad} y1={0} x2={w - pad} y2={0} stroke={c.border} strokeWidth="1" opacity="0.5" />

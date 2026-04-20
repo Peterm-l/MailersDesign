@@ -4,6 +4,16 @@ export type ConnectStep = {
   body: string;
 };
 
+export type BarcodeType = 'fnsku' | 'upc-a' | 'ean-13';
+
+export type Barcode = {
+  enabled: boolean;
+  type: BarcodeType;
+  data: string;
+  title: string;
+  condition: string;
+};
+
 export type Product = {
   key: string;
   name: string;
@@ -12,6 +22,15 @@ export type Product = {
   fcc: string;
   connect: ConnectStep[];
   image: string;
+  barcode: Barcode;
+};
+
+const BARCODE_DEFAULT: Barcode = {
+  enabled: false,
+  type: 'fnsku',
+  data: '',
+  title: '',
+  condition: 'New',
 };
 
 export const DEFAULT_PRODUCTS: Product[] = [
@@ -28,6 +47,7 @@ export const DEFAULT_PRODUCTS: Product[] = [
       { n: '04', title: 'Measure', body: 'Live FFT in-browser. No laptop needed.' },
     ],
     image: '/assets/product-iso.png',
+    barcode: { ...BARCODE_DEFAULT },
   },
   {
     key: 'balancer',
@@ -42,5 +62,6 @@ export const DEFAULT_PRODUCTS: Product[] = [
       { n: '04', title: 'Balance', body: 'Run auto-balance. < 5 min per plane.' },
     ],
     image: '/assets/product-iso-clear.png',
+    barcode: { ...BARCODE_DEFAULT },
   },
 ];

@@ -28,10 +28,26 @@ function loadState(): PersistState {
     if (!raw) throw new Error('no state');
     const parsed = JSON.parse(raw) as PersistState;
     if (!parsed.products || !parsed.settings) throw new Error('malformed');
-    return parsed;
+    return migrate(parsed);
   } catch {
     return { products: DEFAULT_PRODUCTS, settings: DEFAULT_SETTINGS };
   }
+}
+
+function migrate(state: PersistState): PersistState {
+  return {
+    ...state,
+    products: state.products.map((p) => ({
+      ...p,
+      barcode: p.barcode ?? {
+        enabled: false,
+        type: 'fnsku',
+        data: '',
+        title: '',
+        condition: 'New',
+      },
+    })),
+  };
 }
 
 function saveState(state: PersistState) {
