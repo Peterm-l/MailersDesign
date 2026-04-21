@@ -404,9 +404,17 @@ function SinglePanel({ panel, product, accentStyle, productImage, bgColor }: { p
       case 'botLongTop': return <LongWall w={W} h={H} product={product} variant="brand" />;
       case 'botLongBot': return <LongWall w={W} h={H} product={product} variant="tagline" flip />;
       case 'botShortL':  return <ShortWall w={W} h={H} product={product} rotateDir={-90} />;
-      case 'botShortR':  return <ShortWall w={W} h={H} product={product} rotateDir={90} />;
+      case 'botShortR':  return (
+        <g transform={`translate(${W}, 0) scale(-1, 1)`}>
+          <ShortWall w={W} h={H} product={product} rotateDir={-90} />
+        </g>
+      );
       case 'topSideL':   return <TopSideWall w={W} h={H} />;
-      case 'topSideR':   return <TopSideWall w={W} h={H} />;
+      case 'topSideR':   return (
+        <g transform={`translate(${W}, 0) scale(-1, 1)`}>
+          <TopSideWall w={W} h={H} />
+        </g>
+      );
       case 'topFront':   return <TopFrontWall w={W} h={H} product={product} />;
       default: return null;
     }
@@ -467,9 +475,17 @@ export function Dieline({ product, accentStyle = 'spectrum', productImage, bgCol
               {key === 'botLongTop' && <LongWall w={p.w} h={p.h} product={product} variant="brand" />}
               {key === 'botLongBot' && <LongWall w={p.w} h={p.h} product={product} variant="tagline" flip />}
               {key === 'botShortL' && <ShortWall w={p.w} h={p.h} product={product} rotateDir={-90} />}
-              {key === 'botShortR' && <ShortWall w={p.w} h={p.h} product={product} rotateDir={90} />}
+              {key === 'botShortR' && (
+                <g transform={`translate(${p.w}, 0) scale(-1, 1)`}>
+                  <ShortWall w={p.w} h={p.h} product={product} rotateDir={-90} />
+                </g>
+              )}
               {key === 'topSideL' && <TopSideWall w={p.w} h={p.h} />}
-              {key === 'topSideR' && <TopSideWall w={p.w} h={p.h} />}
+              {key === 'topSideR' && (
+                <g transform={`translate(${p.w}, 0) scale(-1, 1)`}>
+                  <TopSideWall w={p.w} h={p.h} />
+                </g>
+              )}
               {key === 'topFront' && <TopFrontWall w={p.w} h={p.h} product={product} />}
             </g>
           </g>
