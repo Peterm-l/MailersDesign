@@ -190,7 +190,12 @@ function TopFace({ w, h, product, accentStyle, productImage }: { w: number; h: n
         <pattern id={`grid-${product.key}`} width="20" height="20" patternUnits="userSpaceOnUse">
           <path d="M 20 0 L 0 0 0 20" fill="none" stroke={c.accent} strokeWidth="0.3" opacity="0.08" />
         </pattern>
+        <radialGradient id={`glow-top-${product.key}`} cx="15%" cy="15%" r="75%">
+          <stop offset="0%" stopColor={c.accent} stopOpacity="0.28" />
+          <stop offset="100%" stopColor={c.accent} stopOpacity="0" />
+        </radialGradient>
       </defs>
+      <rect x="0" y="0" width={w} height={h} fill={`url(#glow-top-${product.key})`} />
       <rect x="0" y="0" width={w} height={h} fill={`url(#grid-${product.key})`} />
 
       {[[pad, pad, 1, 1], [w - pad, pad, -1, 1], [pad, h - pad, 1, -1], [w - pad, h - pad, -1, -1]].map(([x, y, sx, sy], i) => (
@@ -453,10 +458,6 @@ export function Dieline({ product, accentStyle = 'spectrum', productImage, bgCol
               : <rect x={p.x} y={p.y} width={p.w} height={p.h} />}
           </clipPath>
         ))}
-        <radialGradient id={`glow-top-${product.key}`} cx="15%" cy="15%" r="70%">
-          <stop offset="0%" stopColor={c.accent} stopOpacity="0.10" />
-          <stop offset="100%" stopColor={c.accent} stopOpacity="0" />
-        </radialGradient>
       </defs>
 
       {Object.values(PANELS).filter(p => p.noprint).map(p => (
@@ -468,7 +469,6 @@ export function Dieline({ product, accentStyle = 'spectrum', productImage, bgCol
         return (
           <g key={key} clipPath={`url(#clip-${key}-${product.key})`}>
             <rect x={p.x} y={p.y} width={p.w} height={p.h} fill={bgColor} />
-            {key === 'topFace' && <rect x={p.x} y={p.y} width={p.w} height={p.h} fill={`url(#glow-top-${product.key})`} />}
             <g transform={`translate(${p.x}, ${p.y})`}>
               {key === 'topFace' && <TopFace w={p.w} h={p.h} product={product} accentStyle={accentStyle} productImage={productImage} />}
               {key === 'bot' && <BotFace w={p.w} h={p.h} product={product} />}
