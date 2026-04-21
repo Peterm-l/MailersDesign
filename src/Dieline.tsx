@@ -154,8 +154,8 @@ const DEFAULT_SPECTRUM: SpectrumConfig = {
   secondaryAmp: 58,
 };
 
-function SpectrumAccent({ x, y, w, h, bars = 160, config = DEFAULT_SPECTRUM, peakColor = c.accent }: { x: number; y: number; w: number; h: number; bars?: number; config?: SpectrumConfig; peakColor?: string }) {
-  const gap = 0.4;
+function SpectrumAccent({ x, y, w, h, bars = 80, config = DEFAULT_SPECTRUM, peakColor = c.accent }: { x: number; y: number; w: number; h: number; bars?: number; config?: SpectrumConfig; peakColor?: string }) {
+  const gap = 1.4;
   const bw = (w - gap * (bars - 1)) / bars;
 
   // Deterministic hash-based noise so the shape is stable across renders.
@@ -164,58 +164,40 @@ function SpectrumAccent({ x, y, w, h, bars = 160, config = DEFAULT_SPECTRUM, pea
     return v - Math.floor(v);
   };
 
-  // Start with a broadband noise floor (~3-8%).
+  // Low broadband noise floor (~1–5%). Peaks stand well above it.
   const values: number[] = new Array(bars);
   for (let i = 0; i < bars; i++) {
-    values[i] = 0.03 + noise(i) * 0.05;
+    values[i] = 0.015 + noise(i) * 0.04;
   }
 
   const setPeak = (idx: number, amp: number) => {
     if (idx < 0 || idx >= bars) return;
     values[idx] = Math.max(values[idx], amp);
-    // small shoulder on each side so peaks don't look synthetic
-    if (idx > 0) values[idx - 1] = Math.max(values[idx - 1], amp * 0.22);
-    if (idx < bars - 1) values[idx + 1] = Math.max(values[idx + 1], amp * 0.18);
   };
 
   // Fundamental + decaying harmonic series off the primary position.
+  // Offsets are in BAR indices, tuned to cluster tightly on the left
+  // just like the reference analyzer screenshot.
   const fundIdx = Math.round((config.primary / 100) * (bars - 1));
   setPeak(fundIdx, 1.0);
   const harmonics: Array<[number, number]> = [
-    [6, 0.46],
-    [12, 0.32],
-    [19, 0.22],
-    [27, 0.15],
-    [36, 0.10],
+    [3, 0.48],
+    [6, 0.34],
+    [10, 0.24],
+    [15, 0.15],
+    [21, 0.10],
   ];
-  for (const [offset, amp] of harmonics) {
-    setPeak(fundIdx + offset, amp);
-  }
+  for (const [offset, amp] of harmonics) setPeak(fundIdx + offset, amp);
 
   // User-controlled secondary peak (standalone).
   const secIdx = Math.round((config.secondary / 100) * (bars - 1));
   setPeak(secIdx, (config.secondaryAmp / 100) * 0.55);
 
-  // Find tallest bar so the peak can render in the Grayvolt accent.
+  // Find the tallest bar — it renders in the Grayvolt accent.
   let maxIdx = 0;
   for (let i = 1; i < bars; i++) {
     if (values[i] > values[maxIdx]) maxIdx = i;
   }
-
-  // Faint horizontal grid lines for the analyzer look.
-  const gridLines = [0.25, 0.5, 0.75].map((frac) => (
-    <line
-      key={`g-${frac}`}
-      x1={x}
-      y1={y + h - frac * h}
-      x2={x + w}
-      y2={y + h - frac * h}
-      stroke={config.color}
-      strokeWidth="0.3"
-      strokeDasharray="2 2"
-      opacity="0.18"
-    />
-  ));
 
   const items: React.ReactElement[] = values.map((v, i) => {
     const bh = Math.max(0.8, v * h);
@@ -231,12 +213,7 @@ function SpectrumAccent({ x, y, w, h, bars = 160, config = DEFAULT_SPECTRUM, pea
     );
   });
 
-  return (
-    <g>
-      {gridLines}
-      {items}
-    </g>
-  );
+  return <g>{items}</g>;
 }
 
 function WaveformAccent({ x, y, w, h, color = c.accent }: { x: number; y: number; w: number; h: number; color?: string }) {
