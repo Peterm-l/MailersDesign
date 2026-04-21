@@ -10,6 +10,7 @@ const STORAGE_KEY = 'mailer-designs-state-v1';
 type Settings = {
   bg: string;
   accent: Record<string, AccentStyle>;
+  glowIntensity: number;
 };
 
 type PersistState = {
@@ -20,6 +21,7 @@ type PersistState = {
 const DEFAULT_SETTINGS: Settings = {
   bg: '#0a0a0b',
   accent: { analyzer: 'spectrum', balancer: 'spectrum' },
+  glowIntensity: 28,
 };
 
 function loadState(): PersistState {
@@ -37,11 +39,15 @@ function loadState(): PersistState {
 function migrate(state: PersistState): PersistState {
   return {
     ...state,
+    settings: {
+      ...DEFAULT_SETTINGS,
+      ...state.settings,
+    },
     products: state.products.map((p) => ({
       ...p,
       barcode: p.barcode ?? {
         enabled: false,
-        type: 'fnsku',
+        type: 'gs1-128',
         data: '',
         title: '',
         condition: 'New',
@@ -58,12 +64,13 @@ type MailerCardProps = {
   product: Product;
   accentStyle: AccentStyle;
   bgColor: string;
+  glowIntensity: number;
   onProductChange: (next: Product) => void;
   onAccentChange: (style: AccentStyle) => void;
   onResetProduct: () => void;
 };
 
-function MailerCard({ product, accentStyle, bgColor, onProductChange, onAccentChange, onResetProduct }: MailerCardProps) {
+function MailerCard({ product, accentStyle, bgColor, glowIntensity, onProductChange, onAccentChange, onResetProduct }: MailerCardProps) {
   const svgContainerRef = useRef<HTMLDivElement>(null);
 
   const handleExportFull = async () => {
@@ -81,6 +88,7 @@ function MailerCard({ product, accentStyle, bgColor, onProductChange, onAccentCh
       accentStyle,
       productImage: product.image,
       bgColor,
+      glowIntensity,
       filename: `grayvolt-${product.key}-${slug}.png`,
     });
   };
@@ -113,6 +121,7 @@ function MailerCard({ product, accentStyle, bgColor, onProductChange, onAccentCh
           accentStyle={accentStyle}
           productImage={product.image}
           bgColor={bgColor}
+          glowIntensity={glowIntensity}
           showAnnotations={true}
         />
       </div>
@@ -217,6 +226,7 @@ export function App() {
             product={p}
             accentStyle={settings.accent[p.key] ?? 'spectrum'}
             bgColor={settings.bg}
+            glowIntensity={settings.glowIntensity}
             onProductChange={(next) => updateProduct(p.key, next)}
             onAccentChange={(style) =>
               setSettings((s) => ({ ...s, accent: { ...s.accent, [p.key]: style } }))
@@ -235,6 +245,20 @@ export function App() {
             <option value="#131316">Elevated</option>
             <option value="#1a1a1f">Charcoal</option>
           </select>
+        </div>
+        <div className="tweak-row">
+          <label>
+            Top-lid glow <span style={{ color: 'var(--accent)' }}>{settings.glowIntensity}%</span>
+          </label>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={1}
+            value={settings.glowIntensity}
+            onChange={(e) => setSettings((s) => ({ ...s, glowIntensity: Number(e.target.value) }))}
+            style={{ width: '100%' }}
+          />
         </div>
         <div className="tweak-row">
           <label>Project data</label>

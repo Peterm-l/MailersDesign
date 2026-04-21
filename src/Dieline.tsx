@@ -178,11 +178,12 @@ function IconMark({ x, y, size = 20, anchor = 'start' }: MarkProps) {
 
 type AccentStyle = 'spectrum' | 'waveform';
 
-function TopFace({ w, h, product, accentStyle, productImage }: { w: number; h: number; product: Product; accentStyle: AccentStyle; productImage: string }) {
+function TopFace({ w, h, product, accentStyle, productImage, glowIntensity = 28 }: { w: number; h: number; product: Product; accentStyle: AccentStyle; productImage: string; glowIntensity?: number }) {
   const pad = 22;
   const nameParts = product.name.split(' ');
   const first = nameParts[0];
   const rest = nameParts.slice(1).join(' ');
+  const glowOpacity = Math.max(0, Math.min(1, glowIntensity / 100));
 
   return (
     <>
@@ -191,7 +192,7 @@ function TopFace({ w, h, product, accentStyle, productImage }: { w: number; h: n
           <path d="M 20 0 L 0 0 0 20" fill="none" stroke={c.accent} strokeWidth="0.3" opacity="0.08" />
         </pattern>
         <radialGradient id={`glow-top-${product.key}`} cx="15%" cy="15%" r="75%">
-          <stop offset="0%" stopColor={c.accent} stopOpacity="0.28" />
+          <stop offset="0%" stopColor={c.accent} stopOpacity={glowOpacity} />
           <stop offset="100%" stopColor={c.accent} stopOpacity="0" />
         </radialGradient>
       </defs>
@@ -400,11 +401,11 @@ function TopFrontWall({ w, h, product }: { w: number; h: number; product: Produc
   );
 }
 
-function SinglePanel({ panel, product, accentStyle, productImage, bgColor }: { panel: PanelDef; product: Product; accentStyle: AccentStyle; productImage: string; bgColor: string }) {
+function SinglePanel({ panel, product, accentStyle, productImage, bgColor, glowIntensity }: { panel: PanelDef; product: Product; accentStyle: AccentStyle; productImage: string; bgColor: string; glowIntensity?: number }) {
   const W = panel.w, H = panel.h;
   const content = () => {
     switch (panel.key) {
-      case 'topFace':    return <TopFace w={W} h={H} product={product} accentStyle={accentStyle} productImage={productImage} />;
+      case 'topFace':    return <TopFace w={W} h={H} product={product} accentStyle={accentStyle} productImage={productImage} glowIntensity={glowIntensity} />;
       case 'bot':        return <BotFace w={W} h={H} product={product} />;
       case 'botLongTop': return <LongWall w={W} h={H} product={product} variant="brand" />;
       case 'botLongBot': return <LongWall w={W} h={H} product={product} variant="tagline" flip />;
@@ -437,13 +438,14 @@ export type DielineProps = {
   accentStyle?: AccentStyle;
   productImage: string;
   bgColor?: string;
+  glowIntensity?: number;
   showAnnotations?: boolean;
   panelId?: string | null;
 };
 
-export function Dieline({ product, accentStyle = 'spectrum', productImage, bgColor = c.bg, showAnnotations = true, panelId = null }: DielineProps) {
+export function Dieline({ product, accentStyle = 'spectrum', productImage, bgColor = c.bg, glowIntensity = 28, showAnnotations = true, panelId = null }: DielineProps) {
   if (panelId && PANELS[panelId]) {
-    return <SinglePanel panel={PANELS[panelId]} product={product} accentStyle={accentStyle} productImage={productImage} bgColor={bgColor} />;
+    return <SinglePanel panel={PANELS[panelId]} product={product} accentStyle={accentStyle} productImage={productImage} bgColor={bgColor} glowIntensity={glowIntensity} />;
   }
 
   const printed = ['botLongTop', 'botShortL', 'bot', 'botShortR', 'botLongBot', 'topSideL', 'topFace', 'topSideR', 'topFront'];
@@ -470,7 +472,7 @@ export function Dieline({ product, accentStyle = 'spectrum', productImage, bgCol
           <g key={key} clipPath={`url(#clip-${key}-${product.key})`}>
             <rect x={p.x} y={p.y} width={p.w} height={p.h} fill={bgColor} />
             <g transform={`translate(${p.x}, ${p.y})`}>
-              {key === 'topFace' && <TopFace w={p.w} h={p.h} product={product} accentStyle={accentStyle} productImage={productImage} />}
+              {key === 'topFace' && <TopFace w={p.w} h={p.h} product={product} accentStyle={accentStyle} productImage={productImage} glowIntensity={glowIntensity} />}
               {key === 'bot' && <BotFace w={p.w} h={p.h} product={product} />}
               {key === 'botLongTop' && <LongWall w={p.w} h={p.h} product={product} variant="brand" />}
               {key === 'botLongBot' && <LongWall w={p.w} h={p.h} product={product} variant="tagline" flip />}

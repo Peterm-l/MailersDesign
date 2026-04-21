@@ -9,6 +9,7 @@ export function exportPanel(opts: {
   accentStyle: AccentStyle;
   productImage: string;
   bgColor: string;
+  glowIntensity: number;
   filename: string;
 }) {
   const host = document.createElement('div');
@@ -25,6 +26,7 @@ export function exportPanel(opts: {
       accentStyle={opts.accentStyle}
       productImage={opts.productImage}
       bgColor={opts.bgColor}
+      glowIntensity={opts.glowIntensity}
     />,
   );
 
