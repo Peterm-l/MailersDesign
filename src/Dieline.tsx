@@ -40,6 +40,7 @@ const X_TOP_SIDE_R = X_TOP_FACE_R;
 const c = {
   bg: '#0a0a0b', border: '#2a2a30',
   accent: '#c8ff00', accentDim: 'rgba(200,255,0,0.08)',
+  pink: '#ff4d9e',
   text: '#e8e8ec', textDim: '#8b8b96', textMuted: '#5a5a65',
   white: '#ffffff', kraft: '#f4f1e8', kraftEdge: '#e0dcc7',
   cutLine: '#ff4d6a',
@@ -139,13 +140,35 @@ function Body({ x, y, children, size = 10, color = c.textDim, weight = 400, anch
   );
 }
 
-function SpectrumAccent({ x, y, w, h, bars = 24, color = c.accent }: { x: number; y: number; w: number; h: number; bars?: number; color?: string }) {
+function SpectrumAccent({ x, y, w, h, bars = 80, color = c.pink }: { x: number; y: number; w: number; h: number; bars?: number; color?: string }) {
   const items: React.ReactElement[] = [];
-  const gap = 2;
+  const gap = 1;
   const bw = (w - gap * (bars - 1)) / bars;
+
+  // Two gaussian peaks: a dominant primary and a smaller secondary
+  // harmonic — mimics an FFT spectrum from an unbalanced bearing.
+  const peaks = [
+    { mu: 0.28, sigma: 0.06, amp: 1.0 },
+    { mu: 0.62, sigma: 0.045, amp: 0.58 },
+  ];
+
+  // Deterministic hash-based noise so the shape is stable across renders.
+  const noise = (i: number) => {
+    const v = Math.sin(i * 12.9898 + 78.233) * 43758.5453;
+    return v - Math.floor(v);
+  };
+
+  const floor = 0.04;
   for (let i = 0; i < bars; i++) {
-    const t = (Math.sin(i * 1.7) + Math.sin(i * 0.9) + 2) / 4;
-    const bh = Math.max(2, t * h);
+    const t = bars === 1 ? 0 : i / (bars - 1);
+    let v = floor;
+    for (const p of peaks) {
+      const d = (t - p.mu) / p.sigma;
+      v += p.amp * Math.exp(-0.5 * d * d);
+    }
+    v += noise(i) * 0.06;
+    v = Math.min(1, v);
+    const bh = Math.max(1, v * h);
     items.push(<rect key={i} x={x + i * (bw + gap)} y={y + (h - bh)} width={bw} height={bh} fill={color} rx="0.5" />);
   }
   return <g>{items}</g>;
