@@ -4,7 +4,7 @@ export type ConnectStep = {
   body: string;
 };
 
-export type BarcodeType = 'fnsku' | 'upc-a' | 'ean-13';
+export type BarcodeType = 'fnsku' | 'upc-a' | 'ean-13' | 'gs1-128' | 'gs1-datamatrix';
 
 export type Barcode = {
   enabled: boolean;
@@ -27,7 +27,7 @@ export type Product = {
 
 const BARCODE_DEFAULT: Barcode = {
   enabled: false,
-  type: 'fnsku',
+  type: 'gs1-128',
   data: '',
   title: '',
   condition: 'New',

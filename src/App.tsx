@@ -69,7 +69,7 @@ function MailerCard({ product, accentStyle, bgColor, onProductChange, onAccentCh
   const handleExportFull = async () => {
     const svg = svgContainerRef.current?.querySelector('svg');
     if (svg) {
-      await rasterizeSvgToPng(svg as SVGSVGElement, `grayvolt-mailer-${product.key}-full.png`, 300);
+      await rasterizeSvgToPng(svg as SVGSVGElement, `grayvolt-mailer-${product.key}-full.png`, 300, bgColor);
     }
   };
 

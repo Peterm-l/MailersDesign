@@ -31,7 +31,7 @@ export function exportPanel(opts: {
   setTimeout(async () => {
     const svg = host.querySelector('svg');
     if (svg) {
-      await rasterizeSvgToPng(svg as SVGSVGElement, opts.filename, 300);
+      await rasterizeSvgToPng(svg as SVGSVGElement, opts.filename, 300, opts.bgColor);
     }
     setTimeout(() => {
       root.unmount();

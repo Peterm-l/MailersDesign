@@ -6,6 +6,8 @@ const BCID: Record<Barcode['type'], string> = {
   fnsku: 'code128',
   'upc-a': 'upca',
   'ean-13': 'ean13',
+  'gs1-128': 'gs1-128',
+  'gs1-datamatrix': 'gs1datamatrix',
 };
 
 function useBarcodeDataUrl(barcode: Barcode): string | null {

@@ -21,7 +21,12 @@ async function inlineImagesInSvg(svgEl: SVGSVGElement) {
   );
 }
 
-export async function rasterizeSvgToPng(svgEl: SVGSVGElement, filename: string, dpi = 300) {
+export async function rasterizeSvgToPng(
+  svgEl: SVGSVGElement,
+  filename: string,
+  dpi = 300,
+  backgroundColor?: string,
+) {
   const vb = svgEl.viewBox.baseVal;
   const w = vb.width || svgEl.width.baseVal.value;
   const h = vb.height || svgEl.height.baseVal.value;
@@ -47,6 +52,10 @@ export async function rasterizeSvgToPng(svgEl: SVGSVGElement, filename: string, 
     canvas.width = w * scale;
     canvas.height = h * scale;
     const ctx = canvas.getContext('2d')!;
+    if (backgroundColor) {
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
     ctx.scale(scale, scale);
     ctx.drawImage(img, 0, 0);
     const pngBlob = await new Promise<Blob | null>((res) => canvas.toBlob(res, 'image/png'));

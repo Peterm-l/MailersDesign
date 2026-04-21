@@ -126,9 +126,11 @@ export function ProductEditor({ product, onChange, onReset }: Props) {
             onChange={(e) => updateBarcode({ type: e.target.value as BarcodeType })}
             disabled={!product.barcode.enabled}
           >
-            <option value="fnsku">FNSKU · Code 128 (Amazon FBA)</option>
-            <option value="upc-a">UPC-A · 12 digits</option>
-            <option value="ean-13">EAN-13 · 13 digits</option>
+            <option value="fnsku">FNSKU · Code 128 (Amazon FBA unit label)</option>
+            <option value="ean-13">GTIN-13 / EAN-13 · GS1 retail (Amazon listing)</option>
+            <option value="upc-a">UPC-A · GS1 retail (US)</option>
+            <option value="gs1-128">GS1-128 · shipping/logistics</option>
+            <option value="gs1-datamatrix">GS1 DataMatrix · Amazon Transparency</option>
           </select>
         </div>
         <div className="field">
@@ -229,9 +231,19 @@ const BARCODE_HINTS: Record<BarcodeType, { label: string; placeholder: string; h
     help: '12 digits. The 12th digit is a check digit.',
   },
   'ean-13': {
-    label: 'EAN-13',
+    label: 'GTIN-13 / EAN-13',
     placeholder: '0012345678905',
-    help: '13 digits. The 13th digit is a check digit.',
+    help: '13 digits (GS1-issued). The 13th digit is a check digit.',
+  },
+  'gs1-128': {
+    label: 'GS1-128 element string',
+    placeholder: '(01)00012345678905(17)260101',
+    help: 'GS1 application identifiers in parens, e.g. (01) GTIN, (17) expiry YYMMDD, (10) lot.',
+  },
+  'gs1-datamatrix': {
+    label: 'GS1 DataMatrix element string',
+    placeholder: '(01)00012345678905(21)SN123456',
+    help: 'GS1 application identifiers in parens, e.g. (01) GTIN, (21) serial.',
   },
 };
 
@@ -247,7 +259,11 @@ function validateBarcode(type: BarcodeType, data: string): string | null {
     return null;
   }
   if (type === 'ean-13') {
-    if (!/^\d{13}$/.test(s)) return 'EAN-13 must be exactly 13 digits.';
+    if (!/^\d{13}$/.test(s)) return 'GTIN-13 / EAN-13 must be exactly 13 digits.';
+    return null;
+  }
+  if (type === 'gs1-128' || type === 'gs1-datamatrix') {
+    if (!/^\(\d{2,4}\)/.test(s)) return 'Must start with a GS1 AI in parens, e.g. (01)...';
     return null;
   }
   return null;
