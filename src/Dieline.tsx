@@ -140,16 +140,27 @@ function Body({ x, y, children, size = 10, color = c.textDim, weight = 400, anch
   );
 }
 
-function SpectrumAccent({ x, y, w, h, bars = 80, color = c.pink }: { x: number; y: number; w: number; h: number; bars?: number; color?: string }) {
-  const items: React.ReactElement[] = [];
+export type SpectrumConfig = {
+  color: string;
+  primary: number;
+  secondary: number;
+  secondaryAmp: number;
+};
+
+const DEFAULT_SPECTRUM: SpectrumConfig = {
+  color: c.pink,
+  primary: 28,
+  secondary: 62,
+  secondaryAmp: 58,
+};
+
+function SpectrumAccent({ x, y, w, h, bars = 80, config = DEFAULT_SPECTRUM, peakColor = c.accent }: { x: number; y: number; w: number; h: number; bars?: number; config?: SpectrumConfig; peakColor?: string }) {
   const gap = 1;
   const bw = (w - gap * (bars - 1)) / bars;
 
-  // Two gaussian peaks: a dominant primary and a smaller secondary
-  // harmonic — mimics an FFT spectrum from an unbalanced bearing.
   const peaks = [
-    { mu: 0.28, sigma: 0.06, amp: 1.0 },
-    { mu: 0.62, sigma: 0.045, amp: 0.58 },
+    { mu: config.primary / 100, sigma: 0.06, amp: 1.0 },
+    { mu: config.secondary / 100, sigma: 0.045, amp: config.secondaryAmp / 100 },
   ];
 
   // Deterministic hash-based noise so the shape is stable across renders.
@@ -159,6 +170,9 @@ function SpectrumAccent({ x, y, w, h, bars = 80, color = c.pink }: { x: number; 
   };
 
   const floor = 0.04;
+  // Compute all heights first so we can mark the tallest bar.
+  const values: number[] = [];
+  let maxIdx = 0;
   for (let i = 0; i < bars; i++) {
     const t = bars === 1 ? 0 : i / (bars - 1);
     let v = floor;
@@ -168,9 +182,25 @@ function SpectrumAccent({ x, y, w, h, bars = 80, color = c.pink }: { x: number; 
     }
     v += noise(i) * 0.06;
     v = Math.min(1, v);
-    const bh = Math.max(1, v * h);
-    items.push(<rect key={i} x={x + i * (bw + gap)} y={y + (h - bh)} width={bw} height={bh} fill={color} rx="0.5" />);
+    values.push(v);
+    if (v > values[maxIdx]) maxIdx = i;
   }
+
+  const items: React.ReactElement[] = values.map((v, i) => {
+    const bh = Math.max(1, v * h);
+    return (
+      <rect
+        key={i}
+        x={x + i * (bw + gap)}
+        y={y + (h - bh)}
+        width={bw}
+        height={bh}
+        fill={i === maxIdx ? peakColor : config.color}
+        rx="0.5"
+      />
+    );
+  });
+
   return <g>{items}</g>;
 }
 
@@ -201,7 +231,7 @@ function IconMark({ x, y, size = 20, anchor = 'start' }: MarkProps) {
 
 type AccentStyle = 'spectrum' | 'waveform';
 
-function TopFace({ w, h, product, accentStyle, productImage, glowIntensity = 28 }: { w: number; h: number; product: Product; accentStyle: AccentStyle; productImage: string; glowIntensity?: number }) {
+function TopFace({ w, h, product, accentStyle, productImage, glowIntensity = 28, spectrum }: { w: number; h: number; product: Product; accentStyle: AccentStyle; productImage: string; glowIntensity?: number; spectrum?: SpectrumConfig }) {
   const pad = 22;
   const nameParts = product.name.split(' ');
   const first = nameParts[0];
@@ -249,7 +279,7 @@ function TopFace({ w, h, product, accentStyle, productImage, glowIntensity = 28 
 
       <g transform={`translate(${pad + 8}, ${h - pad - 54})`}>
         {accentStyle === 'spectrum'
-          ? <SpectrumAccent x={0} y={0} w={w - pad * 2 - 16} h={18} bars={32} />
+          ? <SpectrumAccent x={0} y={0} w={w - pad * 2 - 16} h={18} config={spectrum ?? DEFAULT_SPECTRUM} />
           : <WaveformAccent x={0} y={0} w={w - pad * 2 - 16} h={18} />}
       </g>
 
@@ -424,11 +454,11 @@ function TopFrontWall({ w, h, product }: { w: number; h: number; product: Produc
   );
 }
 
-function SinglePanel({ panel, product, accentStyle, productImage, bgColor, glowIntensity }: { panel: PanelDef; product: Product; accentStyle: AccentStyle; productImage: string; bgColor: string; glowIntensity?: number }) {
+function SinglePanel({ panel, product, accentStyle, productImage, bgColor, glowIntensity, spectrum }: { panel: PanelDef; product: Product; accentStyle: AccentStyle; productImage: string; bgColor: string; glowIntensity?: number; spectrum?: SpectrumConfig }) {
   const W = panel.w, H = panel.h;
   const content = () => {
     switch (panel.key) {
-      case 'topFace':    return <TopFace w={W} h={H} product={product} accentStyle={accentStyle} productImage={productImage} glowIntensity={glowIntensity} />;
+      case 'topFace':    return <TopFace w={W} h={H} product={product} accentStyle={accentStyle} productImage={productImage} glowIntensity={glowIntensity} spectrum={spectrum} />;
       case 'bot':        return <BotFace w={W} h={H} product={product} />;
       case 'botLongTop': return <LongWall w={W} h={H} product={product} variant="brand" />;
       case 'botLongBot': return <LongWall w={W} h={H} product={product} variant="tagline" flip />;
@@ -462,13 +492,14 @@ export type DielineProps = {
   productImage: string;
   bgColor?: string;
   glowIntensity?: number;
+  spectrum?: SpectrumConfig;
   showAnnotations?: boolean;
   panelId?: string | null;
 };
 
-export function Dieline({ product, accentStyle = 'spectrum', productImage, bgColor = c.bg, glowIntensity = 28, showAnnotations = true, panelId = null }: DielineProps) {
+export function Dieline({ product, accentStyle = 'spectrum', productImage, bgColor = c.bg, glowIntensity = 28, spectrum, showAnnotations = true, panelId = null }: DielineProps) {
   if (panelId && PANELS[panelId]) {
-    return <SinglePanel panel={PANELS[panelId]} product={product} accentStyle={accentStyle} productImage={productImage} bgColor={bgColor} glowIntensity={glowIntensity} />;
+    return <SinglePanel panel={PANELS[panelId]} product={product} accentStyle={accentStyle} productImage={productImage} bgColor={bgColor} glowIntensity={glowIntensity} spectrum={spectrum} />;
   }
 
   const printed = ['botLongTop', 'botShortL', 'bot', 'botShortR', 'botLongBot', 'topSideL', 'topFace', 'topSideR', 'topFront'];
@@ -495,7 +526,7 @@ export function Dieline({ product, accentStyle = 'spectrum', productImage, bgCol
           <g key={key} clipPath={`url(#clip-${key}-${product.key})`}>
             <rect x={p.x} y={p.y} width={p.w} height={p.h} fill={bgColor} />
             <g transform={`translate(${p.x}, ${p.y})`}>
-              {key === 'topFace' && <TopFace w={p.w} h={p.h} product={product} accentStyle={accentStyle} productImage={productImage} glowIntensity={glowIntensity} />}
+              {key === 'topFace' && <TopFace w={p.w} h={p.h} product={product} accentStyle={accentStyle} productImage={productImage} glowIntensity={glowIntensity} spectrum={spectrum} />}
               {key === 'bot' && <BotFace w={p.w} h={p.h} product={product} />}
               {key === 'botLongTop' && <LongWall w={p.w} h={p.h} product={product} variant="brand" />}
               {key === 'botLongBot' && <LongWall w={p.w} h={p.h} product={product} variant="tagline" flip />}

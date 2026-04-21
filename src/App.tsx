@@ -11,6 +11,12 @@ type Settings = {
   bg: string;
   accent: Record<string, AccentStyle>;
   glowIntensity: number;
+  spectrum: {
+    color: string;
+    primary: number;
+    secondary: number;
+    secondaryAmp: number;
+  };
 };
 
 type PersistState = {
@@ -22,6 +28,12 @@ const DEFAULT_SETTINGS: Settings = {
   bg: '#0a0a0b',
   accent: { analyzer: 'spectrum', balancer: 'spectrum' },
   glowIntensity: 28,
+  spectrum: {
+    color: '#ff4d9e',
+    primary: 28,
+    secondary: 62,
+    secondaryAmp: 58,
+  },
 };
 
 function loadState(): PersistState {
@@ -65,12 +77,13 @@ type MailerCardProps = {
   accentStyle: AccentStyle;
   bgColor: string;
   glowIntensity: number;
+  spectrum: Settings['spectrum'];
   onProductChange: (next: Product) => void;
   onAccentChange: (style: AccentStyle) => void;
   onResetProduct: () => void;
 };
 
-function MailerCard({ product, accentStyle, bgColor, glowIntensity, onProductChange, onAccentChange, onResetProduct }: MailerCardProps) {
+function MailerCard({ product, accentStyle, bgColor, glowIntensity, spectrum, onProductChange, onAccentChange, onResetProduct }: MailerCardProps) {
   const svgContainerRef = useRef<HTMLDivElement>(null);
 
   const handleExportFull = async () => {
@@ -89,6 +102,7 @@ function MailerCard({ product, accentStyle, bgColor, glowIntensity, onProductCha
       productImage: product.image,
       bgColor,
       glowIntensity,
+      spectrum,
       filename: `grayvolt-${product.key}-${slug}.png`,
     });
   };
@@ -122,6 +136,7 @@ function MailerCard({ product, accentStyle, bgColor, glowIntensity, onProductCha
           productImage={product.image}
           bgColor={bgColor}
           glowIntensity={glowIntensity}
+          spectrum={spectrum}
           showAnnotations={true}
         />
       </div>
@@ -227,6 +242,7 @@ export function App() {
             accentStyle={settings.accent[p.key] ?? 'spectrum'}
             bgColor={settings.bg}
             glowIntensity={settings.glowIntensity}
+            spectrum={settings.spectrum}
             onProductChange={(next) => updateProduct(p.key, next)}
             onAccentChange={(style) =>
               setSettings((s) => ({ ...s, accent: { ...s.accent, [p.key]: style } }))
@@ -257,6 +273,78 @@ export function App() {
             step={1}
             value={settings.glowIntensity}
             onChange={(e) => setSettings((s) => ({ ...s, glowIntensity: Number(e.target.value) }))}
+            style={{ width: '100%' }}
+          />
+        </div>
+        <div className="tweak-row">
+          <label>Spectrum color (peak bar stays green)</label>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <input
+              type="color"
+              value={settings.spectrum.color}
+              onChange={(e) =>
+                setSettings((s) => ({ ...s, spectrum: { ...s.spectrum, color: e.target.value } }))
+              }
+              style={{ width: 40, height: 32, padding: 0, background: 'transparent', border: '1px solid var(--border)', borderRadius: 6 }}
+            />
+            <input
+              type="text"
+              value={settings.spectrum.color}
+              onChange={(e) => {
+                const v = e.target.value.trim();
+                if (/^#[0-9a-f]{0,6}$/i.test(v)) {
+                  setSettings((s) => ({ ...s, spectrum: { ...s.spectrum, color: v } }));
+                }
+              }}
+              style={{ flex: 1 }}
+            />
+          </div>
+        </div>
+        <div className="tweak-row">
+          <label>
+            Primary peak position <span style={{ color: 'var(--accent)' }}>{settings.spectrum.primary}%</span>
+          </label>
+          <input
+            type="range"
+            min={5}
+            max={95}
+            step={1}
+            value={settings.spectrum.primary}
+            onChange={(e) =>
+              setSettings((s) => ({ ...s, spectrum: { ...s.spectrum, primary: Number(e.target.value) } }))
+            }
+            style={{ width: '100%' }}
+          />
+        </div>
+        <div className="tweak-row">
+          <label>
+            Secondary peak position <span style={{ color: 'var(--accent)' }}>{settings.spectrum.secondary}%</span>
+          </label>
+          <input
+            type="range"
+            min={5}
+            max={95}
+            step={1}
+            value={settings.spectrum.secondary}
+            onChange={(e) =>
+              setSettings((s) => ({ ...s, spectrum: { ...s.spectrum, secondary: Number(e.target.value) } }))
+            }
+            style={{ width: '100%' }}
+          />
+        </div>
+        <div className="tweak-row">
+          <label>
+            Secondary peak height <span style={{ color: 'var(--accent)' }}>{settings.spectrum.secondaryAmp}%</span>
+          </label>
+          <input
+            type="range"
+            min={10}
+            max={100}
+            step={1}
+            value={settings.spectrum.secondaryAmp}
+            onChange={(e) =>
+              setSettings((s) => ({ ...s, spectrum: { ...s.spectrum, secondaryAmp: Number(e.target.value) } }))
+            }
             style={{ width: '100%' }}
           />
         </div>

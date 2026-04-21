@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import { Dieline, type AccentStyle } from './Dieline';
+import { Dieline, type AccentStyle, type SpectrumConfig } from './Dieline';
 import type { Product } from './products';
 import { rasterizeSvgToPng } from './export';
 
@@ -10,6 +10,7 @@ export function exportPanel(opts: {
   productImage: string;
   bgColor: string;
   glowIntensity: number;
+  spectrum: SpectrumConfig;
   filename: string;
 }) {
   const host = document.createElement('div');
@@ -27,6 +28,7 @@ export function exportPanel(opts: {
       productImage={opts.productImage}
       bgColor={opts.bgColor}
       glowIntensity={opts.glowIntensity}
+      spectrum={opts.spectrum}
     />,
   );
 
