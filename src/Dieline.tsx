@@ -217,27 +217,7 @@ function SpectrumAccent({ x, y, w, h, bars = 96, config = DEFAULT_SPECTRUM, peak
     );
   });
 
-  // Soft halo under the tallest bar so the green peak "glows" a little.
-  const peakX = x + maxIdx * (bw + gap) + bw / 2;
-  const haloId = `spec-halo-${Math.round(primary * 1000)}-${Math.round(secondary * 1000)}`;
-  const halo = (
-    <g>
-      <defs>
-        <radialGradient id={haloId} cx="50%" cy="100%" r="70%">
-          <stop offset="0%" stopColor={peakColor} stopOpacity="0.35" />
-          <stop offset="100%" stopColor={peakColor} stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      <ellipse cx={peakX} cy={y + h} rx={Math.max(bw * 4, 14)} ry={h * 0.9} fill={`url(#${haloId})`} />
-    </g>
-  );
-
-  return (
-    <g>
-      {halo}
-      {items}
-    </g>
-  );
+  return <g>{items}</g>;
 }
 
 function WaveformAccent({ x, y, w, h, color = c.accent }: { x: number; y: number; w: number; h: number; color?: string }) {
