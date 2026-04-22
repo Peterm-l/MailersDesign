@@ -14,6 +14,19 @@ export type Barcode = {
   condition: string;
 };
 
+export type QrPlacement = 'topSideL' | 'topSideR' | 'botShortL' | 'botShortR';
+
+export type QrCode = {
+  enabled: boolean;
+  data: string;
+  panels: Record<QrPlacement, boolean>;
+};
+
+export type SidePanelText = {
+  topSideStart: string;
+  topSideEnd: string;
+};
+
 export type Product = {
   key: string;
   name: string;
@@ -22,7 +35,10 @@ export type Product = {
   fcc: string;
   connect: ConnectStep[];
   image: string;
+  showProductImage: boolean;
   barcode: Barcode;
+  qrCode: QrCode;
+  sidePanelText: SidePanelText;
 };
 
 const BARCODE_DEFAULT: Barcode = {
@@ -31,6 +47,17 @@ const BARCODE_DEFAULT: Barcode = {
   data: '',
   title: '',
   condition: 'New',
+};
+
+const QR_DEFAULT: QrCode = {
+  enabled: false,
+  data: 'https://grayvolt.ai',
+  panels: { topSideL: true, topSideR: true, botShortL: false, botShortR: false },
+};
+
+const SIDE_PANEL_TEXT_DEFAULT: SidePanelText = {
+  topSideStart: 'STOP GUESSING · START MEASURING',
+  topSideEnd: 'GRAYVOLT.AI',
 };
 
 export const DEFAULT_PRODUCTS: Product[] = [
@@ -47,7 +74,10 @@ export const DEFAULT_PRODUCTS: Product[] = [
       { n: '04', title: 'Measure', body: 'Live FFT in-browser. No laptop needed.' },
     ],
     image: '/assets/product-iso.png',
+    showProductImage: true,
     barcode: { ...BARCODE_DEFAULT },
+    qrCode: { ...QR_DEFAULT, panels: { ...QR_DEFAULT.panels } },
+    sidePanelText: { ...SIDE_PANEL_TEXT_DEFAULT },
   },
   {
     key: 'balancer',
@@ -62,6 +92,9 @@ export const DEFAULT_PRODUCTS: Product[] = [
       { n: '04', title: 'Balance', body: 'Run auto-balance. < 5 min per plane.' },
     ],
     image: '/assets/product-iso-clear.png',
+    showProductImage: true,
     barcode: { ...BARCODE_DEFAULT },
+    qrCode: { ...QR_DEFAULT, panels: { ...QR_DEFAULT.panels } },
+    sidePanelText: { ...SIDE_PANEL_TEXT_DEFAULT },
   },
 ];

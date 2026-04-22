@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import type { Product, ConnectStep, BarcodeType, Barcode } from './products';
+import type { Product, ConnectStep, BarcodeType, Barcode, QrPlacement } from './products';
 import { fileToDataUrl } from './export';
 
 type Props = {
@@ -81,6 +81,16 @@ export function ProductEditor({ product, onChange, onReset }: Props) {
 
       <section>
         <h4>Product image (top face)</h4>
+        <div className="field">
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <input
+              type="checkbox"
+              checked={product.showProductImage !== false}
+              onChange={(e) => update({ showProductImage: e.target.checked })}
+            />
+            Show product image on top lid
+          </label>
+        </div>
         <div
           className={`image-drop${dragover ? ' dragover' : ''}`}
           onClick={() => fileRef.current?.click()}
@@ -104,6 +114,89 @@ export function ProductEditor({ product, onChange, onReset }: Props) {
               Remove
             </button>
           )}
+        </div>
+      </section>
+
+      <section>
+        <h4>Side-panel text (top side walls)</h4>
+        <div className="field">
+          <label>Start text (near hinge)</label>
+          <input
+            type="text"
+            value={product.sidePanelText?.topSideStart ?? ''}
+            onChange={(e) =>
+              update({ sidePanelText: { ...product.sidePanelText, topSideStart: e.target.value } })
+            }
+          />
+        </div>
+        <div className="field">
+          <label>End text (near tuck flap)</label>
+          <input
+            type="text"
+            value={product.sidePanelText?.topSideEnd ?? ''}
+            onChange={(e) =>
+              update({ sidePanelText: { ...product.sidePanelText, topSideEnd: e.target.value } })
+            }
+          />
+        </div>
+      </section>
+
+      <section>
+        <h4>QR code (side panels)</h4>
+        <div className="field">
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <input
+              type="checkbox"
+              checked={product.qrCode?.enabled ?? false}
+              onChange={(e) =>
+                update({ qrCode: { ...product.qrCode, enabled: e.target.checked } })
+              }
+            />
+            Print QR code on selected panels
+          </label>
+        </div>
+        <div className="field">
+          <label>URL or text to encode</label>
+          <input
+            type="text"
+            value={product.qrCode?.data ?? ''}
+            placeholder="https://grayvolt.ai/setup"
+            onChange={(e) => update({ qrCode: { ...product.qrCode, data: e.target.value } })}
+            disabled={!product.qrCode?.enabled}
+          />
+        </div>
+        <div className="field">
+          <label>Placement</label>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+            {(
+              [
+                ['topSideL', 'Top side — left'],
+                ['topSideR', 'Top side — right'],
+                ['botShortL', 'Bottom short — left'],
+                ['botShortR', 'Bottom short — right'],
+              ] as Array<[QrPlacement, string]>
+            ).map(([key, label]) => (
+              <label
+                key={key}
+                style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, textTransform: 'none', letterSpacing: 0, color: 'var(--text-dim)' }}
+              >
+                <input
+                  type="checkbox"
+                  checked={product.qrCode?.panels?.[key] ?? false}
+                  disabled={!product.qrCode?.enabled}
+                  onChange={(e) =>
+                    update({
+                      qrCode: {
+                        ...product.qrCode,
+                        panels: { ...product.qrCode.panels, [key]: e.target.checked },
+                      },
+                    })
+                  }
+                />
+                {label}
+              </label>
+            ))}
+          </div>
         </div>
       </section>
 

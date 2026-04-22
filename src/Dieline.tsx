@@ -1,5 +1,6 @@
 import type { Product } from './products';
 import { FnskuLabel } from './FnskuLabel';
+import { QrBlock } from './QrBlock';
 
 /* Dieline — 4×4×1 mailer, calibrated against reference image.
    Total die: 9.88" × 11.81". Scale: 100 px = 1 inch. */
@@ -308,7 +309,7 @@ function TopFace({ w, h, product, accentStyle, productImage, glowIntensity = 28,
 
       <text x={pad + 8} y={pad + 182} fill={c.textDim} fontFamily={FONT_BODY} fontSize="11" fontWeight="400">{product.tagline.toLowerCase()}</text>
 
-      {productImage && (
+      {productImage && product.showProductImage !== false && (
         <image href={productImage} x={pad + 40} y={pad + 210} width={w - pad * 2 - 80} height={h - pad - 300} preserveAspectRatio="xMidYMid meet" opacity="0.96" />
       )}
 
@@ -447,8 +448,16 @@ function LongWall({ w, h, product, flip, variant = 'brand' }: { w: number; h: nu
   return flip ? <g transform={`translate(${w}, ${h}) rotate(180)`}>{inner}</g> : <>{inner}</>;
 }
 
-function ShortWall({ w, h, product, rotateDir = -90 }: { w: number; h: number; product: Product; rotateDir?: number }) {
+function ShortWall({ w, h, product, rotateDir = -90, side }: { w: number; h: number; product: Product; rotateDir?: number; side: 'L' | 'R' }) {
   const pad = 10;
+  const qr = product.qrCode;
+  const showQr = !!qr?.enabled && !!qr?.panels?.[side === 'L' ? 'botShortL' : 'botShortR'];
+  const qrSize = Math.min(w - pad * 2, 58);
+  // Panel is rotated so its long axis (h on the dieline) is displayed
+  // horizontally; place QR at the center of that axis.
+  const qrX = (h - qrSize) / 2;
+  const qrY = (w - qrSize) / 2;
+
   return (
     <g transform={`translate(${w / 2}, ${h / 2}) rotate(${rotateDir}) translate(${-h / 2}, ${-w / 2})`}>
       <Mono x={pad} y={w / 2 + 3} size={7.5} ls={1.4} color={c.accent} weight={500}>
@@ -457,20 +466,29 @@ function ShortWall({ w, h, product, rotateDir = -90 }: { w: number; h: number; p
       <Mono x={h - pad} y={w / 2 + 3} anchor="end" size={7.5} ls={1.4} color={c.textDim}>
         {product.sku}
       </Mono>
+      {showQr && <QrBlock x={qrX} y={qrY} size={qrSize} enabled data={qr.data} />}
     </g>
   );
 }
 
-function TopSideWall({ w, h }: { w: number; h: number }) {
+function TopSideWall({ w, h, product, side }: { w: number; h: number; product: Product; side: 'L' | 'R' }) {
   const pad = 10;
+  const text = product.sidePanelText ?? { topSideStart: 'STOP GUESSING · START MEASURING', topSideEnd: 'GRAYVOLT.AI' };
+  const qr = product.qrCode;
+  const showQr = !!qr?.enabled && !!qr?.panels?.[side === 'L' ? 'topSideL' : 'topSideR'];
+  const qrSize = Math.min(w - pad * 2, 58);
+  const qrX = (h - qrSize) / 2;
+  const qrY = (w - qrSize) / 2;
+
   return (
     <g transform={`translate(${w / 2}, ${h / 2}) rotate(-90) translate(${-h / 2}, ${-w / 2})`}>
       <Mono x={pad} y={w / 2 + 3} size={7.5} ls={1.4} color={c.textDim} weight={500}>
-        STOP GUESSING · START MEASURING
+        {text.topSideStart}
       </Mono>
       <Mono x={h - pad} y={w / 2 + 3} anchor="end" size={7.5} ls={1.4} color={c.accent} weight={500}>
-        GRAYVOLT.AI
+        {text.topSideEnd}
       </Mono>
+      {showQr && <QrBlock x={qrX} y={qrY} size={qrSize} enabled data={qr.data} />}
     </g>
   );
 }
@@ -497,16 +515,16 @@ function SinglePanel({ panel, product, accentStyle, productImage, bgColor, glowI
       case 'bot':        return <BotFace w={W} h={H} product={product} />;
       case 'botLongTop': return <LongWall w={W} h={H} product={product} variant="brand" />;
       case 'botLongBot': return <LongWall w={W} h={H} product={product} variant="tagline" flip />;
-      case 'botShortL':  return <ShortWall w={W} h={H} product={product} rotateDir={-90} />;
+      case 'botShortL':  return <ShortWall w={W} h={H} product={product} rotateDir={-90} side="L" />;
       case 'botShortR':  return (
         <g transform={`translate(${W}, 0) scale(-1, 1)`}>
-          <ShortWall w={W} h={H} product={product} rotateDir={-90} />
+          <ShortWall w={W} h={H} product={product} rotateDir={-90} side="R" />
         </g>
       );
-      case 'topSideL':   return <TopSideWall w={W} h={H} />;
+      case 'topSideL':   return <TopSideWall w={W} h={H} product={product} side="L" />;
       case 'topSideR':   return (
         <g transform={`translate(${W}, 0) scale(-1, 1)`}>
-          <TopSideWall w={W} h={H} />
+          <TopSideWall w={W} h={H} product={product} side="R" />
         </g>
       );
       case 'topFront':   return <TopFrontWall w={W} h={H} product={product} />;
@@ -565,16 +583,16 @@ export function Dieline({ product, accentStyle = 'spectrum', productImage, bgCol
               {key === 'bot' && <BotFace w={p.w} h={p.h} product={product} />}
               {key === 'botLongTop' && <LongWall w={p.w} h={p.h} product={product} variant="brand" />}
               {key === 'botLongBot' && <LongWall w={p.w} h={p.h} product={product} variant="tagline" flip />}
-              {key === 'botShortL' && <ShortWall w={p.w} h={p.h} product={product} rotateDir={-90} />}
+              {key === 'botShortL' && <ShortWall w={p.w} h={p.h} product={product} rotateDir={-90} side="L" />}
               {key === 'botShortR' && (
                 <g transform={`translate(${p.w}, 0) scale(-1, 1)`}>
-                  <ShortWall w={p.w} h={p.h} product={product} rotateDir={-90} />
+                  <ShortWall w={p.w} h={p.h} product={product} rotateDir={-90} side="R" />
                 </g>
               )}
-              {key === 'topSideL' && <TopSideWall w={p.w} h={p.h} />}
+              {key === 'topSideL' && <TopSideWall w={p.w} h={p.h} product={product} side="L" />}
               {key === 'topSideR' && (
                 <g transform={`translate(${p.w}, 0) scale(-1, 1)`}>
-                  <TopSideWall w={p.w} h={p.h} />
+                  <TopSideWall w={p.w} h={p.h} product={product} side="R" />
                 </g>
               )}
               {key === 'topFront' && <TopFrontWall w={p.w} h={p.h} product={product} />}

@@ -54,15 +54,26 @@ function migrate(state: PersistState): PersistState {
     settings: {
       ...DEFAULT_SETTINGS,
       ...state.settings,
+      spectrum: { ...DEFAULT_SETTINGS.spectrum, ...(state.settings as Settings).spectrum },
     },
     products: state.products.map((p) => ({
       ...p,
+      showProductImage: p.showProductImage ?? true,
       barcode: p.barcode ?? {
         enabled: false,
         type: 'gs1-128',
         data: '',
         title: '',
         condition: 'New',
+      },
+      qrCode: p.qrCode ?? {
+        enabled: false,
+        data: 'https://grayvolt.ai',
+        panels: { topSideL: true, topSideR: true, botShortL: false, botShortR: false },
+      },
+      sidePanelText: p.sidePanelText ?? {
+        topSideStart: 'STOP GUESSING · START MEASURING',
+        topSideEnd: 'GRAYVOLT.AI',
       },
     })),
   };
