@@ -28,6 +28,70 @@ export type SidePanelText = {
   topSideEnd: string;
 };
 
+export type TextSlotId =
+  | 'topFaceEyebrow'
+  | 'topFaceBottomLeft'
+  | 'topFaceBottomRight'
+  | 'botFaceHeader'
+  | 'botFaceTitle'
+  | 'botFaceModelLabel'
+  | 'botFaceFccLabel'
+  | 'botFaceInputLabel'
+  | 'botFaceInputValue'
+  | 'botFaceOrigin'
+  | 'botFaceCopyright'
+  | 'topFrontPrefix'
+  | 'longWallEyebrow'
+  | 'longWallTaglinePart1'
+  | 'longWallTaglinePart2'
+  | 'longWallBrand';
+
+export type TextOverride = {
+  text?: string;
+  dx?: number;
+  dy?: number;
+};
+
+export type TextOverrides = Partial<Record<TextSlotId, TextOverride>>;
+
+export const TEXT_SLOT_DEFAULTS: Record<TextSlotId, string> = {
+  topFaceEyebrow: 'INDUSTRIAL · EDGE · WIRELESS',
+  topFaceBottomLeft: 'STOP GUESSING · START MEASURING',
+  topFaceBottomRight: 'GRAYVOLT.AI',
+  botFaceHeader: 'HOW TO CONNECT',
+  botFaceTitle: 'Up and running in under 5 minutes.',
+  botFaceModelLabel: 'MODEL',
+  botFaceFccLabel: 'FCC ID',
+  botFaceInputLabel: 'INPUT',
+  botFaceInputValue: 'USB-C · 5V⎓500mA',
+  botFaceOrigin: 'ASSEMBLED & DESIGNED IN USA',
+  botFaceCopyright: 'GRAYVOLT.AI · © GRAYVOLT LLC',
+  topFrontPrefix: 'MODEL',
+  longWallEyebrow: 'INDUSTRIAL SENSORS',
+  longWallTaglinePart1: 'Stop guessing.',
+  longWallTaglinePart2: 'Start measuring.',
+  longWallBrand: 'GRAYVOLT.AI',
+};
+
+export const TEXT_SLOT_LABELS: Record<TextSlotId, string> = {
+  topFaceEyebrow: 'Top face — eyebrow',
+  topFaceBottomLeft: 'Top face — bottom left',
+  topFaceBottomRight: 'Top face — bottom right',
+  botFaceHeader: 'Bot face — header',
+  botFaceTitle: 'Bot face — title',
+  botFaceModelLabel: 'Bot face — MODEL label',
+  botFaceFccLabel: 'Bot face — FCC ID label',
+  botFaceInputLabel: 'Bot face — INPUT label',
+  botFaceInputValue: 'Bot face — input value',
+  botFaceOrigin: 'Bot face — origin',
+  botFaceCopyright: 'Bot face — copyright',
+  topFrontPrefix: 'Top front — prefix',
+  longWallEyebrow: 'Long wall — eyebrow',
+  longWallTaglinePart1: 'Long wall — tagline part 1',
+  longWallTaglinePart2: 'Long wall — tagline part 2',
+  longWallBrand: 'Long wall — brand URL',
+};
+
 export type Product = {
   key: string;
   name: string;
@@ -40,6 +104,7 @@ export type Product = {
   barcode: Barcode;
   qrCode: QrCode;
   sidePanelText: SidePanelText;
+  textOverrides: TextOverrides;
 };
 
 const BARCODE_DEFAULT: Barcode = {
@@ -80,6 +145,7 @@ export const DEFAULT_PRODUCTS: Product[] = [
     barcode: { ...BARCODE_DEFAULT },
     qrCode: { ...QR_DEFAULT, panels: { ...QR_DEFAULT.panels } },
     sidePanelText: { ...SIDE_PANEL_TEXT_DEFAULT },
+    textOverrides: {},
   },
   {
     key: 'balancer',
@@ -98,5 +164,6 @@ export const DEFAULT_PRODUCTS: Product[] = [
     barcode: { ...BARCODE_DEFAULT },
     qrCode: { ...QR_DEFAULT, panels: { ...QR_DEFAULT.panels } },
     sidePanelText: { ...SIDE_PANEL_TEXT_DEFAULT },
+    textOverrides: {},
   },
 ];

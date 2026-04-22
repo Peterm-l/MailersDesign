@@ -1,6 +1,16 @@
-import type { Product } from './products';
+import type { Product, TextSlotId } from './products';
+import { TEXT_SLOT_DEFAULTS } from './products';
 import { FnskuLabel } from './FnskuLabel';
 import { QrBlock } from './QrBlock';
+
+function slot(product: Product, id: TextSlotId): { text: string; dx: number; dy: number } {
+  const ov = product.textOverrides?.[id];
+  return {
+    text: ov?.text ?? TEXT_SLOT_DEFAULTS[id],
+    dx: ov?.dx ?? 0,
+    dy: ov?.dy ?? 0,
+  };
+}
 
 /* Dieline — 4×4×1 mailer, calibrated against reference image.
    Total die: 9.88" × 11.81". Scale: 100 px = 1 inch. */
@@ -272,9 +282,14 @@ function TopFace({ w, h, product, accentStyle, productImage, glowIntensity = 28,
         <path key={i} d={`M${x + sx * 22},${y} L${x},${y} L${x},${y + sy * 22}`} stroke={c.accent} strokeWidth="1.5" fill="none" />
       ))}
 
-      <Mono x={pad + 8} y={pad + 14} size={9} ls={2} color={c.accent} weight={500}>
-        INDUSTRIAL · EDGE · WIRELESS
-      </Mono>
+      {(() => {
+        const s = slot(product, 'topFaceEyebrow');
+        return (
+          <Mono x={pad + 8 + s.dx} y={pad + 14 + s.dy} size={9} ls={2} color={c.accent} weight={500}>
+            {s.text}
+          </Mono>
+        );
+      })()}
       <IconMark x={w - pad - 8} y={pad + 11} size={18} anchor="end" />
       <Mono x={w - pad - 32} y={pad + 14} anchor="end" size={9} ls={1.5} color={c.textDim} weight={500}>
         {product.sku}
@@ -300,12 +315,20 @@ function TopFace({ w, h, product, accentStyle, productImage, glowIntensity = 28,
       </g>
 
       <line x1={pad + 8} y1={h - pad - 28} x2={w - pad - 8} y2={h - pad - 28} stroke={c.accent} strokeWidth="0.8" opacity="0.4" />
-      <Mono x={pad + 8} y={h - pad - 12} size={9} ls={1.8} color={c.text} weight={500}>
-        STOP GUESSING · START MEASURING
-      </Mono>
-      <Mono x={w - pad - 8} y={h - pad - 12} anchor="end" size={9} ls={1.5} color={c.accent} weight={500}>
-        GRAYVOLT.AI
-      </Mono>
+      {(() => {
+        const sL = slot(product, 'topFaceBottomLeft');
+        const sR = slot(product, 'topFaceBottomRight');
+        return (
+          <>
+            <Mono x={pad + 8 + sL.dx} y={h - pad - 12 + sL.dy} size={9} ls={1.8} color={c.text} weight={500}>
+              {sL.text}
+            </Mono>
+            <Mono x={w - pad - 8 + sR.dx} y={h - pad - 12 + sR.dy} anchor="end" size={9} ls={1.5} color={c.accent} weight={500}>
+              {sR.text}
+            </Mono>
+          </>
+        );
+      })()}
     </>
   );
 }
@@ -324,10 +347,19 @@ function BotFace({ w, h, product }: { w: number; h: number; product: Product }) 
   const labelX = (w - labelW) / 2;
   const labelY = h - pad - 62 - labelH - 12;
 
+  const sHeader = slot(product, 'botFaceHeader');
+  const sTitle = slot(product, 'botFaceTitle');
+  const sModel = slot(product, 'botFaceModelLabel');
+  const sFcc = slot(product, 'botFaceFccLabel');
+  const sInputL = slot(product, 'botFaceInputLabel');
+  const sInputV = slot(product, 'botFaceInputValue');
+  const sOrigin = slot(product, 'botFaceOrigin');
+  const sCopyright = slot(product, 'botFaceCopyright');
+
   return (
     <>
-      <Mono x={pad} y={pad + 4} size={10} ls={2} color={c.accent} weight={500}>HOW TO CONNECT</Mono>
-      <Display x={pad} y={pad + 34} size={22} weight={700} ls={-0.5}>Up and running in under 5 minutes.</Display>
+      <Mono x={pad + sHeader.dx} y={pad + 4 + sHeader.dy} size={10} ls={2} color={c.accent} weight={500}>{sHeader.text}</Mono>
+      <Display x={pad + sTitle.dx} y={pad + 34 + sTitle.dy} size={22} weight={700} ls={-0.5}>{sTitle.text}</Display>
       <line x1={pad} y1={pad + 48} x2={w - pad} y2={pad + 48} stroke={c.accent} strokeWidth="1" opacity="0.4" />
 
       <g transform={`translate(${pad}, ${pad + 68})`}>
@@ -370,23 +402,23 @@ function BotFace({ w, h, product }: { w: number; h: number; product: Product }) 
       <g transform={`translate(0, ${h - pad - 62})`}>
         <line x1={pad} y1={0} x2={w - pad} y2={0} stroke={c.border} strokeWidth="1" opacity="0.5" />
 
-        <Mono x={pad} y={14} size={7} ls={1.2} color={c.textMuted}>MODEL</Mono>
+        <Mono x={pad + sModel.dx} y={14 + sModel.dy} size={7} ls={1.2} color={c.textMuted}>{sModel.text}</Mono>
         <Body x={pad} y={27} size={9.5} color={c.text} weight={500}>{product.sku}</Body>
 
-        <Mono x={pad + 100} y={14} size={7} ls={1.2} color={c.textMuted}>FCC ID</Mono>
+        <Mono x={pad + 100 + sFcc.dx} y={14 + sFcc.dy} size={7} ls={1.2} color={c.textMuted}>{sFcc.text}</Mono>
         <Body x={pad + 100} y={27} size={9.5} color={c.text} weight={500}>{product.fcc || '________'}</Body>
 
-        <Mono x={w - pad} y={14} anchor="end" size={7} ls={1.2} color={c.textMuted}>INPUT</Mono>
-        <text x={w - pad} y={27} fill={c.text} fontFamily={FONT_BODY} fontSize="9.5" fontWeight="500" textAnchor="end">
-          USB-C · 5V⎓500mA
+        <Mono x={w - pad + sInputL.dx} y={14 + sInputL.dy} anchor="end" size={7} ls={1.2} color={c.textMuted}>{sInputL.text}</Mono>
+        <text x={w - pad + sInputV.dx} y={27 + sInputV.dy} fill={c.text} fontFamily={FONT_BODY} fontSize="9.5" fontWeight="500" textAnchor="end">
+          {sInputV.text}
         </text>
 
-        <Mono x={w / 2} y={46} anchor="middle" size={7.5} ls={1.5} color={c.accent} weight={500}>
-          ASSEMBLED & DESIGNED IN USA
+        <Mono x={w / 2 + sOrigin.dx} y={46 + sOrigin.dy} anchor="middle" size={7.5} ls={1.5} color={c.accent} weight={500}>
+          {sOrigin.text}
         </Mono>
 
-        <text x={w / 2} y={60} fill={c.textMuted} fontFamily={FONT_MONO} fontSize="7" letterSpacing="0.8" textAnchor="middle">
-          GRAYVOLT.AI · © GRAYVOLT LLC
+        <text x={w / 2 + sCopyright.dx} y={60 + sCopyright.dy} fill={c.textMuted} fontFamily={FONT_MONO} fontSize="7" letterSpacing="0.8" textAnchor="middle">
+          {sCopyright.text}
         </text>
       </g>
     </>
@@ -395,16 +427,20 @@ function BotFace({ w, h, product }: { w: number; h: number; product: Product }) 
 
 function LongWall({ w, h, product, flip, variant = 'brand' }: { w: number; h: number; product: Product; flip?: boolean; variant?: 'brand' | 'tagline' }) {
   const pad = 12;
+  const sEb = slot(product, 'longWallEyebrow');
+  const sT1 = slot(product, 'longWallTaglinePart1');
+  const sT2 = slot(product, 'longWallTaglinePart2');
+  const sBrand = slot(product, 'longWallBrand');
   const inner = variant === 'tagline' ? (
     <>
-      <Mono x={pad} y={h / 2 - 6} size={7} ls={1.5} color={c.textMuted} weight={500}>
-        INDUSTRIAL SENSORS
+      <Mono x={pad + sEb.dx} y={h / 2 - 6 + sEb.dy} size={7} ls={1.5} color={c.textMuted} weight={500}>
+        {sEb.text}
       </Mono>
-      <text x={pad} y={h / 2 + 16} fill={c.text} fontFamily={FONT_DISPLAY} fontSize="18" fontWeight="800" letterSpacing="-0.8">
-        Stop guessing.<tspan fill={c.accent}> Start measuring.</tspan>
+      <text x={pad + sT1.dx} y={h / 2 + 16 + sT1.dy} fill={c.text} fontFamily={FONT_DISPLAY} fontSize="18" fontWeight="800" letterSpacing="-0.8">
+        {sT1.text}<tspan fill={c.accent} dx={sT2.dx} dy={sT2.dy}> {sT2.text}</tspan>
       </text>
-      <Mono x={w - pad} y={h / 2 + 14} anchor="end" size={8} ls={1.5} color={c.accent} weight={500}>
-        GRAYVOLT.AI
+      <Mono x={w - pad + sBrand.dx} y={h / 2 + 14 + sBrand.dy} anchor="end" size={8} ls={1.5} color={c.accent} weight={500}>
+        {sBrand.text}
       </Mono>
     </>
   ) : (
@@ -479,13 +515,14 @@ function TopSideWall({ w, h, product, side }: { w: number; h: number; product: P
 
 function TopFrontWall({ w, h, product }: { w: number; h: number; product: Product }) {
   const pad = 10;
+  const sPrefix = slot(product, 'topFrontPrefix');
   return (
     <>
       <g transform={`translate(${pad}, ${h / 2 + 5})`}>
         <Wordmark x={0} y={0} size={14} />
       </g>
-      <Mono x={w - pad} y={h / 2 + 4} anchor="end" size={8.5} ls={1.5} color={c.accent} weight={500}>
-        MODEL {product.sku}
+      <Mono x={w - pad + sPrefix.dx} y={h / 2 + 4 + sPrefix.dy} anchor="end" size={8.5} ls={1.5} color={c.accent} weight={500}>
+        {sPrefix.text} {product.sku}
       </Mono>
     </>
   );

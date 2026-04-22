@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
-import type { Product, ConnectStep, BarcodeType, Barcode, QrPlacement } from './products';
+import type { Product, ConnectStep, BarcodeType, Barcode, QrPlacement, TextSlotId, TextOverride } from './products';
+import { TEXT_SLOT_DEFAULTS, TEXT_SLOT_LABELS } from './products';
 import { fileToDataUrl } from './export';
 
 type Props = {
@@ -286,6 +287,61 @@ export function ProductEditor({ product, onChange, onReset }: Props) {
             </select>
           </div>
         )}
+      </section>
+
+      <section>
+        <h4>Text & positioning</h4>
+        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 10 }}>
+          Override any printed string, and nudge it with dx/dy offsets (in px).
+        </div>
+        {(Object.keys(TEXT_SLOT_DEFAULTS) as TextSlotId[]).map((id) => {
+          const ov: TextOverride = product.textOverrides?.[id] ?? {};
+          const setOv = (patch: Partial<TextOverride>) => {
+            const next: TextOverride = { ...ov, ...patch };
+            // Clean up empty overrides to keep storage tidy.
+            const effective: TextOverride = {};
+            if (next.text !== undefined && next.text !== TEXT_SLOT_DEFAULTS[id]) effective.text = next.text;
+            if (next.dx) effective.dx = next.dx;
+            if (next.dy) effective.dy = next.dy;
+            const overrides: Record<string, TextOverride> = { ...(product.textOverrides ?? {}) };
+            if (Object.keys(effective).length === 0) delete overrides[id];
+            else overrides[id] = effective;
+            update({ textOverrides: overrides });
+          };
+          return (
+            <div key={id} style={{ borderTop: '1px solid var(--border)', paddingTop: 8, marginTop: 8 }}>
+              <label style={{ display: 'block', fontSize: 9, letterSpacing: 1, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: 4 }}>
+                {TEXT_SLOT_LABELS[id]}
+              </label>
+              <input
+                type="text"
+                value={ov.text ?? TEXT_SLOT_DEFAULTS[id]}
+                onChange={(e) => setOv({ text: e.target.value })}
+                style={{ marginBottom: 4 }}
+              />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, textTransform: 'none', letterSpacing: 0, color: 'var(--text-muted)' }}>
+                  dx
+                  <input
+                    type="number"
+                    value={ov.dx ?? 0}
+                    onChange={(e) => setOv({ dx: Number(e.target.value) || 0 })}
+                    style={{ padding: '4px 6px', fontSize: 11 }}
+                  />
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, textTransform: 'none', letterSpacing: 0, color: 'var(--text-muted)' }}>
+                  dy
+                  <input
+                    type="number"
+                    value={ov.dy ?? 0}
+                    onChange={(e) => setOv({ dy: Number(e.target.value) || 0 })}
+                    style={{ padding: '4px 6px', fontSize: 11 }}
+                  />
+                </label>
+              </div>
+            </div>
+          );
+        })}
       </section>
 
       <section>

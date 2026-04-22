@@ -79,6 +79,7 @@ function migrate(state: PersistState): PersistState {
         topSideStart: 'STOP GUESSING · START MEASURING',
         topSideEnd: 'GRAYVOLT.AI',
       },
+      textOverrides: p.textOverrides ?? {},
     })),
   };
 }
