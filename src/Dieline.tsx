@@ -12,6 +12,14 @@ function slot(product: Product, id: TextSlotId): { text: string; dx: number; dy:
   };
 }
 
+function Editable({ slotId, children }: { slotId: TextSlotId; children: React.ReactNode }) {
+  return (
+    <g data-slot-id={slotId} style={{ cursor: 'pointer' }}>
+      {children}
+    </g>
+  );
+}
+
 /* Dieline — 4×4×1 mailer, calibrated against reference image.
    Total die: 9.88" × 11.81". Scale: 100 px = 1 inch. */
 
@@ -285,9 +293,11 @@ function TopFace({ w, h, product, accentStyle, productImage, glowIntensity = 28,
       {(() => {
         const s = slot(product, 'topFaceEyebrow');
         return (
-          <Mono x={pad + 8 + s.dx} y={pad + 14 + s.dy} size={9} ls={2} color={c.accent} weight={500}>
-            {s.text}
-          </Mono>
+          <Editable slotId="topFaceEyebrow">
+            <Mono x={pad + 8 + s.dx} y={pad + 14 + s.dy} size={9} ls={2} color={c.accent} weight={500}>
+              {s.text}
+            </Mono>
+          </Editable>
         );
       })()}
       <IconMark x={w - pad - 8} y={pad + 11} size={18} anchor="end" />
@@ -320,12 +330,16 @@ function TopFace({ w, h, product, accentStyle, productImage, glowIntensity = 28,
         const sR = slot(product, 'topFaceBottomRight');
         return (
           <>
-            <Mono x={pad + 8 + sL.dx} y={h - pad - 12 + sL.dy} size={9} ls={1.8} color={c.text} weight={500}>
-              {sL.text}
-            </Mono>
-            <Mono x={w - pad - 8 + sR.dx} y={h - pad - 12 + sR.dy} anchor="end" size={9} ls={1.5} color={c.accent} weight={500}>
-              {sR.text}
-            </Mono>
+            <Editable slotId="topFaceBottomLeft">
+              <Mono x={pad + 8 + sL.dx} y={h - pad - 12 + sL.dy} size={9} ls={1.8} color={c.text} weight={500}>
+                {sL.text}
+              </Mono>
+            </Editable>
+            <Editable slotId="topFaceBottomRight">
+              <Mono x={w - pad - 8 + sR.dx} y={h - pad - 12 + sR.dy} anchor="end" size={9} ls={1.5} color={c.accent} weight={500}>
+                {sR.text}
+              </Mono>
+            </Editable>
           </>
         );
       })()}
@@ -358,8 +372,12 @@ function BotFace({ w, h, product }: { w: number; h: number; product: Product }) 
 
   return (
     <>
-      <Mono x={pad + sHeader.dx} y={pad + 4 + sHeader.dy} size={10} ls={2} color={c.accent} weight={500}>{sHeader.text}</Mono>
-      <Display x={pad + sTitle.dx} y={pad + 34 + sTitle.dy} size={22} weight={700} ls={-0.5}>{sTitle.text}</Display>
+      <Editable slotId="botFaceHeader">
+        <Mono x={pad + sHeader.dx} y={pad + 4 + sHeader.dy} size={10} ls={2} color={c.accent} weight={500}>{sHeader.text}</Mono>
+      </Editable>
+      <Editable slotId="botFaceTitle">
+        <Display x={pad + sTitle.dx} y={pad + 34 + sTitle.dy} size={22} weight={700} ls={-0.5}>{sTitle.text}</Display>
+      </Editable>
       <line x1={pad} y1={pad + 48} x2={w - pad} y2={pad + 48} stroke={c.accent} strokeWidth="1" opacity="0.4" />
 
       <g transform={`translate(${pad}, ${pad + 68})`}>
@@ -402,24 +420,36 @@ function BotFace({ w, h, product }: { w: number; h: number; product: Product }) 
       <g transform={`translate(0, ${h - pad - 62})`}>
         <line x1={pad} y1={0} x2={w - pad} y2={0} stroke={c.border} strokeWidth="1" opacity="0.5" />
 
-        <Mono x={pad + sModel.dx} y={14 + sModel.dy} size={7} ls={1.2} color={c.textMuted}>{sModel.text}</Mono>
+        <Editable slotId="botFaceModelLabel">
+          <Mono x={pad + sModel.dx} y={14 + sModel.dy} size={7} ls={1.2} color={c.textMuted}>{sModel.text}</Mono>
+        </Editable>
         <Body x={pad} y={27} size={9.5} color={c.text} weight={500}>{product.sku}</Body>
 
-        <Mono x={pad + 100 + sFcc.dx} y={14 + sFcc.dy} size={7} ls={1.2} color={c.textMuted}>{sFcc.text}</Mono>
+        <Editable slotId="botFaceFccLabel">
+          <Mono x={pad + 100 + sFcc.dx} y={14 + sFcc.dy} size={7} ls={1.2} color={c.textMuted}>{sFcc.text}</Mono>
+        </Editable>
         <Body x={pad + 100} y={27} size={9.5} color={c.text} weight={500}>{product.fcc || '________'}</Body>
 
-        <Mono x={w - pad + sInputL.dx} y={14 + sInputL.dy} anchor="end" size={7} ls={1.2} color={c.textMuted}>{sInputL.text}</Mono>
-        <text x={w - pad + sInputV.dx} y={27 + sInputV.dy} fill={c.text} fontFamily={FONT_BODY} fontSize="9.5" fontWeight="500" textAnchor="end">
-          {sInputV.text}
-        </text>
+        <Editable slotId="botFaceInputLabel">
+          <Mono x={w - pad + sInputL.dx} y={14 + sInputL.dy} anchor="end" size={7} ls={1.2} color={c.textMuted}>{sInputL.text}</Mono>
+        </Editable>
+        <Editable slotId="botFaceInputValue">
+          <text x={w - pad + sInputV.dx} y={27 + sInputV.dy} fill={c.text} fontFamily={FONT_BODY} fontSize="9.5" fontWeight="500" textAnchor="end">
+            {sInputV.text}
+          </text>
+        </Editable>
 
-        <Mono x={w / 2 + sOrigin.dx} y={46 + sOrigin.dy} anchor="middle" size={7.5} ls={1.5} color={c.accent} weight={500}>
-          {sOrigin.text}
-        </Mono>
+        <Editable slotId="botFaceOrigin">
+          <Mono x={w / 2 + sOrigin.dx} y={46 + sOrigin.dy} anchor="middle" size={7.5} ls={1.5} color={c.accent} weight={500}>
+            {sOrigin.text}
+          </Mono>
+        </Editable>
 
-        <text x={w / 2 + sCopyright.dx} y={60 + sCopyright.dy} fill={c.textMuted} fontFamily={FONT_MONO} fontSize="7" letterSpacing="0.8" textAnchor="middle">
-          {sCopyright.text}
-        </text>
+        <Editable slotId="botFaceCopyright">
+          <text x={w / 2 + sCopyright.dx} y={60 + sCopyright.dy} fill={c.textMuted} fontFamily={FONT_MONO} fontSize="7" letterSpacing="0.8" textAnchor="middle">
+            {sCopyright.text}
+          </text>
+        </Editable>
       </g>
     </>
   );
@@ -433,15 +463,21 @@ function LongWall({ w, h, product, flip, variant = 'brand' }: { w: number; h: nu
   const sBrand = slot(product, 'longWallBrand');
   const inner = variant === 'tagline' ? (
     <>
-      <Mono x={pad + sEb.dx} y={h / 2 - 6 + sEb.dy} size={7} ls={1.5} color={c.textMuted} weight={500}>
-        {sEb.text}
-      </Mono>
-      <text x={pad + sT1.dx} y={h / 2 + 16 + sT1.dy} fill={c.text} fontFamily={FONT_DISPLAY} fontSize="18" fontWeight="800" letterSpacing="-0.8">
-        {sT1.text}<tspan fill={c.accent} dx={sT2.dx} dy={sT2.dy}> {sT2.text}</tspan>
-      </text>
-      <Mono x={w - pad + sBrand.dx} y={h / 2 + 14 + sBrand.dy} anchor="end" size={8} ls={1.5} color={c.accent} weight={500}>
-        {sBrand.text}
-      </Mono>
+      <Editable slotId="longWallEyebrow">
+        <Mono x={pad + sEb.dx} y={h / 2 - 6 + sEb.dy} size={7} ls={1.5} color={c.textMuted} weight={500}>
+          {sEb.text}
+        </Mono>
+      </Editable>
+      <Editable slotId="longWallTaglinePart1">
+        <text x={pad + sT1.dx} y={h / 2 + 16 + sT1.dy} fill={c.text} fontFamily={FONT_DISPLAY} fontSize="18" fontWeight="800" letterSpacing="-0.8">
+          {sT1.text}<tspan fill={c.accent} dx={sT2.dx} dy={sT2.dy}> {sT2.text}</tspan>
+        </text>
+      </Editable>
+      <Editable slotId="longWallBrand">
+        <Mono x={w - pad + sBrand.dx} y={h / 2 + 14 + sBrand.dy} anchor="end" size={8} ls={1.5} color={c.accent} weight={500}>
+          {sBrand.text}
+        </Mono>
+      </Editable>
     </>
   ) : (
     <>
@@ -492,7 +528,8 @@ function ShortWall({ w, h, product, rotateDir = -90, side }: { w: number; h: num
 
 function TopSideWall({ w, h, product, side }: { w: number; h: number; product: Product; side: 'L' | 'R' }) {
   const pad = 10;
-  const text = product.sidePanelText ?? { topSideStart: 'STOP GUESSING · START MEASURING', topSideEnd: 'GRAYVOLT.AI' };
+  const sStart = slot(product, 'topSideStart');
+  const sEnd = slot(product, 'topSideEnd');
   const qr = product.qrCode;
   const showQr = !!qr?.enabled && !!qr?.panels?.[side === 'L' ? 'topSideL' : 'topSideR'];
   const qrSize = Math.min(w - pad * 2, 58);
@@ -502,12 +539,16 @@ function TopSideWall({ w, h, product, side }: { w: number; h: number; product: P
 
   return (
     <g transform={`translate(${w / 2}, ${h / 2}) rotate(-90) translate(${-h / 2}, ${-w / 2})`}>
-      <Mono x={pad} y={w / 2 + 3} size={7.5} ls={1.4} color={c.textDim} weight={500}>
-        {text.topSideStart}
-      </Mono>
-      <Mono x={h - pad} y={w / 2 + 3} anchor="end" size={7.5} ls={1.4} color={c.accent} weight={500}>
-        {text.topSideEnd}
-      </Mono>
+      <Editable slotId="topSideStart">
+        <Mono x={pad + sStart.dx} y={w / 2 + 3 + sStart.dy} size={7.5} ls={1.4} color={c.textDim} weight={500}>
+          {sStart.text}
+        </Mono>
+      </Editable>
+      <Editable slotId="topSideEnd">
+        <Mono x={h - pad + sEnd.dx} y={w / 2 + 3 + sEnd.dy} anchor="end" size={7.5} ls={1.4} color={c.accent} weight={500}>
+          {sEnd.text}
+        </Mono>
+      </Editable>
       {showQr && <QrBlock x={qrX} y={qrY} size={qrSize} enabled data={qr.data} />}
     </g>
   );
@@ -521,9 +562,11 @@ function TopFrontWall({ w, h, product }: { w: number; h: number; product: Produc
       <g transform={`translate(${pad}, ${h / 2 + 5})`}>
         <Wordmark x={0} y={0} size={14} />
       </g>
-      <Mono x={w - pad + sPrefix.dx} y={h / 2 + 4 + sPrefix.dy} anchor="end" size={8.5} ls={1.5} color={c.accent} weight={500}>
-        {sPrefix.text} {product.sku}
-      </Mono>
+      <Editable slotId="topFrontPrefix">
+        <Mono x={w - pad + sPrefix.dx} y={h / 2 + 4 + sPrefix.dy} anchor="end" size={8.5} ls={1.5} color={c.accent} weight={500}>
+          {sPrefix.text} {product.sku}
+        </Mono>
+      </Editable>
     </>
   );
 }

@@ -44,7 +44,9 @@ export type TextSlotId =
   | 'longWallEyebrow'
   | 'longWallTaglinePart1'
   | 'longWallTaglinePart2'
-  | 'longWallBrand';
+  | 'longWallBrand'
+  | 'topSideStart'
+  | 'topSideEnd';
 
 export type TextOverride = {
   text?: string;
@@ -71,6 +73,8 @@ export const TEXT_SLOT_DEFAULTS: Record<TextSlotId, string> = {
   longWallTaglinePart1: 'Stop guessing.',
   longWallTaglinePart2: 'Start measuring.',
   longWallBrand: 'GRAYVOLT.AI',
+  topSideStart: 'STOP GUESSING · START MEASURING',
+  topSideEnd: 'GRAYVOLT.AI',
 };
 
 export const TEXT_SLOT_LABELS: Record<TextSlotId, string> = {
@@ -90,6 +94,8 @@ export const TEXT_SLOT_LABELS: Record<TextSlotId, string> = {
   longWallTaglinePart1: 'Long wall — tagline part 1',
   longWallTaglinePart2: 'Long wall — tagline part 2',
   longWallBrand: 'Long wall — brand URL',
+  topSideStart: 'Top side wall — start text',
+  topSideEnd: 'Top side wall — end text',
 };
 
 export type Product = {

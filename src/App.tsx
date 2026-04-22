@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Dieline, EXPORTABLE_PANELS, type AccentStyle } from './Dieline';
-import { DEFAULT_PRODUCTS, type Product } from './products';
+import { DEFAULT_PRODUCTS, type Product, type TextSlotId } from './products';
 import { rasterizeSvgToPng } from './export';
 import { exportPanel } from './offscreenExport';
 import { ProductEditor } from './ProductEditor';
+import { TextPopup } from './TextPopup';
 
 const STORAGE_KEY = 'mailer-designs-state-v1';
 
@@ -48,6 +49,19 @@ function loadState(): PersistState {
   }
 }
 
+function migrateSidePanelText(p: Product): Product['textOverrides'] {
+  const overrides = { ...(p.textOverrides ?? {}) };
+  const start = p.sidePanelText?.topSideStart;
+  const end = p.sidePanelText?.topSideEnd;
+  if (start && start !== 'STOP GUESSING · START MEASURING' && !overrides.topSideStart) {
+    overrides.topSideStart = { text: start };
+  }
+  if (end && end !== 'GRAYVOLT.AI' && !overrides.topSideEnd) {
+    overrides.topSideEnd = { text: end };
+  }
+  return overrides;
+}
+
 function migrate(state: PersistState): PersistState {
   return {
     ...state,
@@ -79,7 +93,7 @@ function migrate(state: PersistState): PersistState {
         topSideStart: 'STOP GUESSING · START MEASURING',
         topSideEnd: 'GRAYVOLT.AI',
       },
-      textOverrides: p.textOverrides ?? {},
+      textOverrides: migrateSidePanelText(p),
     })),
   };
 }
@@ -101,6 +115,16 @@ type MailerCardProps = {
 
 function MailerCard({ product, accentStyle, bgColor, glowIntensity, spectrum, onProductChange, onAccentChange, onResetProduct }: MailerCardProps) {
   const svgContainerRef = useRef<HTMLDivElement>(null);
+  const [editingSlot, setEditingSlot] = useState<{ id: TextSlotId; x: number; y: number } | null>(null);
+
+  const handleDielineClick = (e: React.MouseEvent) => {
+    const target = (e.target as Element).closest('[data-slot-id]');
+    if (target instanceof Element) {
+      const slotId = target.getAttribute('data-slot-id') as TextSlotId;
+      const rect = target.getBoundingClientRect();
+      setEditingSlot({ id: slotId, x: rect.left, y: rect.bottom + 6 });
+    }
+  };
 
   const handleExportFull = async () => {
     const svg = svgContainerRef.current?.querySelector('svg');
@@ -145,7 +169,7 @@ function MailerCard({ product, accentStyle, bgColor, glowIntensity, spectrum, on
           </button>
         </div>
       </div>
-      <div className="dieline-wrap" ref={svgContainerRef}>
+      <div className="dieline-wrap" ref={svgContainerRef} onClick={handleDielineClick}>
         <Dieline
           product={product}
           accentStyle={accentStyle}
@@ -164,6 +188,16 @@ function MailerCard({ product, accentStyle, bgColor, glowIntensity, spectrum, on
         </span>
       </div>
       <ProductEditor product={product} onChange={onProductChange} onReset={onResetProduct} />
+      {editingSlot && (
+        <TextPopup
+          product={product}
+          slotId={editingSlot.id}
+          screenX={editingSlot.x}
+          screenY={editingSlot.y}
+          onChange={onProductChange}
+          onClose={() => setEditingSlot(null)}
+        />
+      )}
       <div className="panel-exports">
         <h4>Export individual panels</h4>
         <div className="panel-grid">
