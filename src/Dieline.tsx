@@ -154,53 +154,55 @@ const DEFAULT_SPECTRUM: SpectrumConfig = {
   secondaryAmp: 58,
 };
 
-function SpectrumAccent({ x, y, w, h, bars = 80, config = DEFAULT_SPECTRUM, peakColor = c.accent }: { x: number; y: number; w: number; h: number; bars?: number; config?: SpectrumConfig; peakColor?: string }) {
-  const gap = 1.4;
+function SpectrumAccent({ x, y, w, h, bars = 96, config = DEFAULT_SPECTRUM, peakColor = c.accent }: { x: number; y: number; w: number; h: number; bars?: number; config?: SpectrumConfig; peakColor?: string }) {
+  const gap = 1;
   const bw = (w - gap * (bars - 1)) / bars;
 
-  // Deterministic hash-based noise so the shape is stable across renders.
+  // Stable hash noise — same render every time for the same config.
   const noise = (i: number) => {
     const v = Math.sin(i * 12.9898 + 78.233) * 43758.5453;
     return v - Math.floor(v);
   };
 
-  // Low broadband noise floor (~1–5%). Peaks stand well above it.
+  // A smooth envelope made of several gaussians spread across the full
+  // width gives visual balance (no dead zone on the right). Per-bar
+  // jitter on top of the envelope breaks up the smoothness so it reads
+  // as "data" rather than a drawn curve.
+  const primary = config.primary / 100;
+  const secondary = config.secondary / 100;
+  const secAmp = config.secondaryAmp / 100;
+
+  const envelopes = [
+    { mu: primary,                        sigma: 0.030, amp: 1.00 },  // main — becomes green
+    { mu: Math.min(0.98, primary + 0.09), sigma: 0.045, amp: 0.55 },  // near-primary shoulder
+    { mu: secondary,                      sigma: 0.060, amp: 0.80 * secAmp },
+    { mu: 0.48,                           sigma: 0.10,  amp: 0.22 },  // mid filler
+    { mu: 0.86,                           sigma: 0.09,  amp: 0.28 },  // right-side filler
+  ];
+
   const values: number[] = new Array(bars);
   for (let i = 0; i < bars; i++) {
-    values[i] = 0.015 + noise(i) * 0.04;
+    const t = i / (bars - 1);
+    let env = 0;
+    for (const p of envelopes) {
+      const d = (t - p.mu) / p.sigma;
+      env += p.amp * Math.exp(-0.5 * d * d);
+    }
+    // Jitter: each bar's height is the envelope scaled by 0.55-1.0,
+    // with a small baseline so there's always visible texture.
+    const jitter = 0.55 + 0.45 * noise(i);
+    const baseline = 0.025 + noise(i + 101) * 0.045;
+    values[i] = Math.max(baseline, Math.min(1, env * jitter));
   }
 
-  const setPeak = (idx: number, amp: number) => {
-    if (idx < 0 || idx >= bars) return;
-    values[idx] = Math.max(values[idx], amp);
-  };
-
-  // Fundamental + decaying harmonic series off the primary position.
-  // Offsets are in BAR indices, tuned to cluster tightly on the left
-  // just like the reference analyzer screenshot.
-  const fundIdx = Math.round((config.primary / 100) * (bars - 1));
-  setPeak(fundIdx, 1.0);
-  const harmonics: Array<[number, number]> = [
-    [3, 0.48],
-    [6, 0.34],
-    [10, 0.24],
-    [15, 0.15],
-    [21, 0.10],
-  ];
-  for (const [offset, amp] of harmonics) setPeak(fundIdx + offset, amp);
-
-  // User-controlled secondary peak (standalone).
-  const secIdx = Math.round((config.secondary / 100) * (bars - 1));
-  setPeak(secIdx, (config.secondaryAmp / 100) * 0.55);
-
-  // Find the tallest bar — it renders in the Grayvolt accent.
+  // Tallest bar → Grayvolt green accent; everything else is the user color.
   let maxIdx = 0;
   for (let i = 1; i < bars; i++) {
     if (values[i] > values[maxIdx]) maxIdx = i;
   }
 
   const items: React.ReactElement[] = values.map((v, i) => {
-    const bh = Math.max(0.8, v * h);
+    const bh = Math.max(1, v * h);
     return (
       <rect
         key={i}
@@ -208,12 +210,33 @@ function SpectrumAccent({ x, y, w, h, bars = 80, config = DEFAULT_SPECTRUM, peak
         y={y + (h - bh)}
         width={bw}
         height={bh}
+        rx={Math.min(0.8, bw / 2)}
         fill={i === maxIdx ? peakColor : config.color}
       />
     );
   });
 
-  return <g>{items}</g>;
+  // Soft halo under the tallest bar so the green peak "glows" a little.
+  const peakX = x + maxIdx * (bw + gap) + bw / 2;
+  const haloId = `spec-halo-${Math.round(primary * 1000)}-${Math.round(secondary * 1000)}`;
+  const halo = (
+    <g>
+      <defs>
+        <radialGradient id={haloId} cx="50%" cy="100%" r="70%">
+          <stop offset="0%" stopColor={peakColor} stopOpacity="0.35" />
+          <stop offset="100%" stopColor={peakColor} stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <ellipse cx={peakX} cy={y + h} rx={Math.max(bw * 4, 14)} ry={h * 0.9} fill={`url(#${haloId})`} />
+    </g>
+  );
+
+  return (
+    <g>
+      {halo}
+      {items}
+    </g>
+  );
 }
 
 function WaveformAccent({ x, y, w, h, color = c.accent }: { x: number; y: number; w: number; h: number; color?: string }) {
