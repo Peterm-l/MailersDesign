@@ -166,6 +166,23 @@ export function ProductEditor({ product, onChange, onReset }: Props) {
           />
         </div>
         <div className="field">
+          <label>
+            Position along panel <span style={{ color: 'var(--accent)' }}>{product.qrCode?.position ?? 50}%</span>
+          </label>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={1}
+            value={product.qrCode?.position ?? 50}
+            disabled={!product.qrCode?.enabled}
+            onChange={(e) =>
+              update({ qrCode: { ...product.qrCode, position: Number(e.target.value) } })
+            }
+            style={{ width: '100%' }}
+          />
+        </div>
+        <div className="field">
           <label>Placement</label>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
             {(

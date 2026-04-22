@@ -66,10 +66,14 @@ function migrate(state: PersistState): PersistState {
         title: '',
         condition: 'New',
       },
-      qrCode: p.qrCode ?? {
-        enabled: false,
-        data: 'https://grayvolt.ai',
-        panels: { topSideL: true, topSideR: true, botShortL: false, botShortR: false },
+      qrCode: {
+        ...{
+          enabled: false,
+          data: 'https://grayvolt.ai',
+          panels: { topSideL: true, topSideR: true, botShortL: false, botShortR: false },
+          position: 50,
+        },
+        ...(p.qrCode ?? {}),
       },
       sidePanelText: p.sidePanelText ?? {
         topSideStart: 'STOP GUESSING · START MEASURING',

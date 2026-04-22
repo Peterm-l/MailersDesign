@@ -20,6 +20,7 @@ export type QrCode = {
   enabled: boolean;
   data: string;
   panels: Record<QrPlacement, boolean>;
+  position: number;
 };
 
 export type SidePanelText = {
@@ -53,6 +54,7 @@ const QR_DEFAULT: QrCode = {
   enabled: false,
   data: 'https://grayvolt.ai',
   panels: { topSideL: true, topSideR: true, botShortL: false, botShortR: false },
+  position: 50,
 };
 
 const SIDE_PANEL_TEXT_DEFAULT: SidePanelText = {
