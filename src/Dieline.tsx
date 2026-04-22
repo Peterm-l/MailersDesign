@@ -433,10 +433,12 @@ function ShortWall({ w, h, product, rotateDir = -90, side }: { w: number; h: num
   const qr = product.qrCode;
   const showQr = !!qr?.enabled && !!qr?.panels?.[side === 'L' ? 'botShortL' : 'botShortR'];
   const qrSize = Math.min(w - pad * 2, 58);
-  // Panel is rotated so its long axis (h on the dieline) is displayed
-  // horizontally. 0 = top of panel on the flat dieline, 100 = bottom.
+  // Panel is rotated -90° so increasing qrX moves UP on the flat dieline.
+  // The right-side scaleX(-1) wrapper flips horizontally only, so vertical
+  // position is shared — same formula on both sides keeps the QRs aligned.
+  // Slider: 0 = top of panel on dieline, 100 = bottom.
   const pos = Math.max(0, Math.min(100, qr?.position ?? 50)) / 100;
-  const qrX = (h - qrSize) * (side === 'L' ? pos : 1 - pos);
+  const qrX = (h - qrSize) * (1 - pos);
   const qrY = (w - qrSize) / 2;
 
   return (
@@ -459,7 +461,7 @@ function TopSideWall({ w, h, product, side }: { w: number; h: number; product: P
   const showQr = !!qr?.enabled && !!qr?.panels?.[side === 'L' ? 'topSideL' : 'topSideR'];
   const qrSize = Math.min(w - pad * 2, 58);
   const pos = Math.max(0, Math.min(100, qr?.position ?? 50)) / 100;
-  const qrX = (h - qrSize) * (side === 'L' ? pos : 1 - pos);
+  const qrX = (h - qrSize) * (1 - pos);
   const qrY = (w - qrSize) / 2;
 
   return (
