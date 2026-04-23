@@ -537,9 +537,13 @@ function TopSideWall({ w, h, product, side }: { w: number; h: number; product: P
   const pos = Math.max(0, Math.min(100, qr?.position ?? 50)) / 100;
   const qrX = (h - qrSize) * (1 - pos);
   const qrY = (w - qrSize) / 2;
+  // Left side reads top-to-bottom (rotate +90); right side keeps the
+  // original bottom-to-top direction (rotate -90). No scaleX — that
+  // would mirror the glyphs.
+  const rotateDir = side === 'L' ? 90 : -90;
 
   return (
-    <g transform={`translate(${w / 2}, ${h / 2}) rotate(-90) translate(${-h / 2}, ${-w / 2})`}>
+    <g transform={`translate(${w / 2}, ${h / 2}) rotate(${rotateDir}) translate(${-h / 2}, ${-w / 2})`}>
       <Editable slotId="topSideStart">
         <Mono x={pad + sStart.dx} y={w / 2 + 3 + sStart.dy} size={7.5} ls={1.4} color={c.textDim} weight={500}>
           {sStart.text}
