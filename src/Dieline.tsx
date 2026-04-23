@@ -580,8 +580,12 @@ function TopSideWall({ w, h, product, side }: { w: number; h: number; product: P
 function TopFrontWall({ w, h, product }: { w: number; h: number; product: Product }) {
   const pad = 10;
   const sPrefix = slot(product, 'topFrontPrefix');
+  // On the flat dieline the lip sits directly below the top face.
+  // When folded down 90° to form the front of the box, any text drawn
+  // right-side-up on the flat would appear upside-down on the
+  // assembled package — so we draw it flipped 180° on the flat.
   return (
-    <>
+    <g transform={`translate(${w / 2}, ${h / 2}) rotate(180) translate(${-w / 2}, ${-h / 2})`}>
       <g transform={`translate(${pad}, ${h / 2 + 5})`}>
         <Wordmark x={0} y={0} size={14} />
       </g>
@@ -590,7 +594,7 @@ function TopFrontWall({ w, h, product }: { w: number; h: number; product: Produc
           {sPrefix.text} {product.sku}
         </Mono>
       </Editable>
-    </>
+    </g>
   );
 }
 
