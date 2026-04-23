@@ -542,15 +542,25 @@ function TopSideWall({ w, h, product, side }: { w: number; h: number; product: P
   // would mirror the glyphs.
   const rotateDir = side === 'L' ? 90 : -90;
 
+  // With rotate(+90) on the left side the rotated x axis is reversed
+  // from the right side, so we swap which slot lands near the top of
+  // the panel. Desired reading order top-to-bottom on the left is
+  // GRAYVOLT.AI → QR → tagline; on the right it's the same order but
+  // read bottom-to-top, which naturally falls out of rotate(-90).
+  const startX = side === 'L' ? h - pad : pad;
+  const endX = side === 'L' ? pad : h - pad;
+  const startAnchor: 'start' | 'end' = side === 'L' ? 'end' : 'start';
+  const endAnchor: 'start' | 'end' = side === 'L' ? 'start' : 'end';
+
   return (
     <g transform={`translate(${w / 2}, ${h / 2}) rotate(${rotateDir}) translate(${-h / 2}, ${-w / 2})`}>
       <Editable slotId="topSideStart">
-        <Mono x={pad + sStart.dx} y={w / 2 + 3 + sStart.dy} size={7.5} ls={1.4} color={c.textDim} weight={500}>
+        <Mono x={startX + sStart.dx} y={w / 2 + 3 + sStart.dy} anchor={startAnchor} size={7.5} ls={1.4} color={c.textDim} weight={500}>
           {sStart.text}
         </Mono>
       </Editable>
       <Editable slotId="topSideEnd">
-        <Mono x={h - pad + sEnd.dx} y={w / 2 + 3 + sEnd.dy} anchor="end" size={7.5} ls={1.4} color={c.accent} weight={500}>
+        <Mono x={endX + sEnd.dx} y={w / 2 + 3 + sEnd.dy} anchor={endAnchor} size={7.5} ls={1.4} color={c.accent} weight={500}>
           {sEnd.text}
         </Mono>
       </Editable>
