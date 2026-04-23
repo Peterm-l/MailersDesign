@@ -580,13 +580,21 @@ function SinglePanel({ panel, product, accentStyle, productImage, bgColor, glowI
       case 'bot':        return <BotFace w={W} h={H} product={product} />;
       case 'botLongTop': return <LongWall w={W} h={H} product={product} variant="brand" />;
       case 'botLongBot': return <LongWall w={W} h={H} product={product} variant="tagline" flip />;
-      case 'botShortL':  return <ShortWall w={W} h={H} product={product} rotateDir={-90} side="L" />;
+      case 'botShortL':  return (
+        <g transform={`translate(${W}, 0) scale(-1, 1)`}>
+          <ShortWall w={W} h={H} product={product} rotateDir={-90} side="L" />
+        </g>
+      );
       case 'botShortR':  return (
         <g transform={`translate(${W}, 0) scale(-1, 1)`}>
           <ShortWall w={W} h={H} product={product} rotateDir={-90} side="R" />
         </g>
       );
-      case 'topSideL':   return <TopSideWall w={W} h={H} product={product} side="L" />;
+      case 'topSideL':   return (
+        <g transform={`translate(${W}, 0) scale(-1, 1)`}>
+          <TopSideWall w={W} h={H} product={product} side="L" />
+        </g>
+      );
       case 'topSideR':   return (
         <g transform={`translate(${W}, 0) scale(-1, 1)`}>
           <TopSideWall w={W} h={H} product={product} side="R" />
@@ -648,13 +656,21 @@ export function Dieline({ product, accentStyle = 'spectrum', productImage, bgCol
               {key === 'bot' && <BotFace w={p.w} h={p.h} product={product} />}
               {key === 'botLongTop' && <LongWall w={p.w} h={p.h} product={product} variant="brand" />}
               {key === 'botLongBot' && <LongWall w={p.w} h={p.h} product={product} variant="tagline" flip />}
-              {key === 'botShortL' && <ShortWall w={p.w} h={p.h} product={product} rotateDir={-90} side="L" />}
+              {key === 'botShortL' && (
+                <g transform={`translate(${p.w}, 0) scale(-1, 1)`}>
+                  <ShortWall w={p.w} h={p.h} product={product} rotateDir={-90} side="L" />
+                </g>
+              )}
               {key === 'botShortR' && (
                 <g transform={`translate(${p.w}, 0) scale(-1, 1)`}>
                   <ShortWall w={p.w} h={p.h} product={product} rotateDir={-90} side="R" />
                 </g>
               )}
-              {key === 'topSideL' && <TopSideWall w={p.w} h={p.h} product={product} side="L" />}
+              {key === 'topSideL' && (
+                <g transform={`translate(${p.w}, 0) scale(-1, 1)`}>
+                  <TopSideWall w={p.w} h={p.h} product={product} side="L" />
+                </g>
+              )}
               {key === 'topSideR' && (
                 <g transform={`translate(${p.w}, 0) scale(-1, 1)`}>
                   <TopSideWall w={p.w} h={p.h} product={product} side="R" />
