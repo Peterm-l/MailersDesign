@@ -527,7 +527,7 @@ function ShortWall({ w, h, product, rotateDir = -90, side }: { w: number; h: num
   );
 }
 
-function TopSideWall({ w, h, product, side, rotateDir = 90 }: { w: number; h: number; product: Product; side: 'L' | 'R'; rotateDir?: number }) {
+function TopSideWall({ w, h, product, side }: { w: number; h: number; product: Product; side: 'L' | 'R' }) {
   const pad = 10;
   const sStart = slot(product, 'topSideStart');
   const sEnd = slot(product, 'topSideEnd');
@@ -539,7 +539,7 @@ function TopSideWall({ w, h, product, side, rotateDir = 90 }: { w: number; h: nu
   const qrY = (w - qrSize) / 2;
 
   return (
-    <g transform={`translate(${w / 2}, ${h / 2}) rotate(${rotateDir}) translate(${-h / 2}, ${-w / 2})`}>
+    <g transform={`translate(${w / 2}, ${h / 2}) rotate(-90) translate(${-h / 2}, ${-w / 2})`}>
       <Editable slotId="topSideStart">
         <Mono x={pad + sStart.dx} y={w / 2 + 3 + sStart.dy} size={7.5} ls={1.4} color={c.textDim} weight={500}>
           {sStart.text}
