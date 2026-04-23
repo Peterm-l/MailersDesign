@@ -555,16 +555,20 @@ function TopSideWall({ w, h, product, side }: { w: number; h: number; product: P
   const endX = side === 'L' ? pad : h - pad;
   const startAnchor: 'start' | 'end' = side === 'L' ? 'end' : 'start';
   const endAnchor: 'start' | 'end' = side === 'L' ? 'start' : 'end';
+  // dx/dy are stored in the pre-rotation inner frame; +90 vs -90
+  // rotation flips both axes, so negate the offsets on the left so
+  // the visual direction of a nudge matches the right side.
+  const flip = side === 'L' ? -1 : 1;
 
   return (
     <g transform={`translate(${w / 2}, ${h / 2}) rotate(${rotateDir}) translate(${-h / 2}, ${-w / 2})`}>
       <Editable slotId="topSideStart">
-        <Mono x={startX + sStart.dx} y={w / 2 + 3 + sStart.dy} anchor={startAnchor} size={7.5} ls={1.4} color={c.textDim} weight={500}>
+        <Mono x={startX + flip * sStart.dx} y={w / 2 + 3 + flip * sStart.dy} anchor={startAnchor} size={7.5} ls={1.4} color={c.textDim} weight={500}>
           {sStart.text}
         </Mono>
       </Editable>
       <Editable slotId="topSideEnd">
-        <Mono x={endX + sEnd.dx} y={w / 2 + 3 + sEnd.dy} anchor={endAnchor} size={7.5} ls={1.4} color={c.accent} weight={500}>
+        <Mono x={endX + flip * sEnd.dx} y={w / 2 + 3 + flip * sEnd.dy} anchor={endAnchor} size={7.5} ls={1.4} color={c.accent} weight={500}>
           {sEnd.text}
         </Mono>
       </Editable>
