@@ -356,10 +356,11 @@ function BotFace({ w, h, product }: { w: number; h: number; product: Product }) 
   // the footer top (h - pad - 62 = ~y=316). DataMatrix is square so
   // it gets a slightly taller, narrower box; linear codes get a strip.
   const isSquare = product.barcode?.type === 'gs1-datamatrix';
-  const labelW = isSquare ? 90 : 170;
-  const labelH = isSquare ? 78 : 60;
+  const isRetail = product.barcode?.type === 'upc-a' || product.barcode?.type === 'ean-13';
+  const labelW = isSquare ? 90 : isRetail ? 150 : 170;
+  const labelH = isSquare ? 78 : isRetail ? 88 : 60;
   const labelX = (w - labelW) / 2;
-  const labelY = h - pad - 62 - labelH - 12;
+  const labelY = h - pad - 62 - labelH - 8;
 
   const sHeader = slot(product, 'botFaceHeader');
   const sTitle = slot(product, 'botFaceTitle');

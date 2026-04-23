@@ -19,17 +19,24 @@ function useBarcodeDataUrl(barcode: Barcode): string | null {
       return;
     }
     const canvas = document.createElement('canvas');
+    const isRetail = barcode.type === 'upc-a' || barcode.type === 'ean-13';
     try {
       bwipjs.toCanvas(canvas, {
         bcid: BCID[barcode.type],
         text: barcode.data.trim(),
         scale: 4,
-        height: 10,
+        // bwip-js height is in millimeters. 25mm ≈ standard retail
+        // barcode height; taller bars read at more scan distances.
+        height: isRetail ? 22 : 14,
         includetext: true,
-        textxalign: 'center',
-        textsize: 9,
-        paddingwidth: 6,
-        paddingheight: 4,
+        // textxalign only applies to linear non-UPC/EAN codes; for UPC-A
+        // and EAN-13 bwip-js always uses the split-digit layout. We omit
+        // textxalign so those two render with their native formatting
+        // (leading digit to the left, trailing digit to the right).
+        ...(isRetail ? {} : { textxalign: 'center' as const }),
+        textsize: isRetail ? 10 : 9,
+        paddingwidth: 4,
+        paddingheight: 2,
         backgroundcolor: 'FFFFFF',
       });
       setUrl(canvas.toDataURL('image/png'));
