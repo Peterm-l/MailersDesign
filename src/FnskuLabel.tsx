@@ -67,8 +67,9 @@ export function FnskuLabel({ x, y, w, h, barcode, fallbackTitle }: Props) {
   const url = useBarcodeDataUrl(barcode);
   if (!barcode.enabled) return null;
 
-  const title = (barcode.title || fallbackTitle || '').trim();
-  const showCondition = barcode.type === 'fnsku';
+  const isFnsku = barcode.type === 'fnsku';
+  const title = isFnsku ? (barcode.title || fallbackTitle || '').trim() : '';
+  const showCondition = isFnsku;
   const pad = 6;
 
   const titleH = title ? 14 : 0;

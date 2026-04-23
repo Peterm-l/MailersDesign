@@ -260,16 +260,18 @@ export function ProductEditor({ product, onChange, onReset }: Props) {
             <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 4 }}>{dataHint.help}</div>
           )}
         </div>
-        <div className="field">
-          <label>Title on label (blank = product name)</label>
-          <input
-            type="text"
-            value={product.barcode.title}
-            placeholder={product.name}
-            onChange={(e) => updateBarcode({ title: e.target.value })}
-            disabled={!product.barcode.enabled}
-          />
-        </div>
+        {product.barcode.type === 'fnsku' && (
+          <div className="field">
+            <label>Title on label (blank = product name)</label>
+            <input
+              type="text"
+              value={product.barcode.title}
+              placeholder={product.name}
+              onChange={(e) => updateBarcode({ title: e.target.value })}
+              disabled={!product.barcode.enabled}
+            />
+          </div>
+        )}
         {product.barcode.type === 'fnsku' && (
           <div className="field">
             <label>Condition</label>
