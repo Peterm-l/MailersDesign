@@ -527,7 +527,7 @@ function ShortWall({ w, h, product, rotateDir = -90, side }: { w: number; h: num
   );
 }
 
-function TopSideWall({ w, h, product, side }: { w: number; h: number; product: Product; side: 'L' | 'R' }) {
+function TopSideWall({ w, h, product, side, rotateDir = 90 }: { w: number; h: number; product: Product; side: 'L' | 'R'; rotateDir?: number }) {
   const pad = 10;
   const sStart = slot(product, 'topSideStart');
   const sEnd = slot(product, 'topSideEnd');
@@ -539,7 +539,7 @@ function TopSideWall({ w, h, product, side }: { w: number; h: number; product: P
   const qrY = (w - qrSize) / 2;
 
   return (
-    <g transform={`translate(${w / 2}, ${h / 2}) rotate(-90) translate(${-h / 2}, ${-w / 2})`}>
+    <g transform={`translate(${w / 2}, ${h / 2}) rotate(${rotateDir}) translate(${-h / 2}, ${-w / 2})`}>
       <Editable slotId="topSideStart">
         <Mono x={pad + sStart.dx} y={w / 2 + 3 + sStart.dy} size={7.5} ls={1.4} color={c.textDim} weight={500}>
           {sStart.text}
@@ -586,16 +586,8 @@ function SinglePanel({ panel, product, accentStyle, productImage, bgColor, glowI
           <ShortWall w={W} h={H} product={product} rotateDir={-90} side="R" />
         </g>
       );
-      case 'topSideL':   return (
-        <g transform={`translate(${W}, 0) scale(-1, 1)`}>
-          <TopSideWall w={W} h={H} product={product} side="L" />
-        </g>
-      );
-      case 'topSideR':   return (
-        <g transform={`translate(${W}, 0) scale(-1, 1)`}>
-          <TopSideWall w={W} h={H} product={product} side="R" />
-        </g>
-      );
+      case 'topSideL':   return <TopSideWall w={W} h={H} product={product} side="L" />;
+      case 'topSideR':   return <TopSideWall w={W} h={H} product={product} side="R" />;
       case 'topFront':   return <TopFrontWall w={W} h={H} product={product} />;
       default: return null;
     }
@@ -658,16 +650,8 @@ export function Dieline({ product, accentStyle = 'spectrum', productImage, bgCol
                   <ShortWall w={p.w} h={p.h} product={product} rotateDir={-90} side="R" />
                 </g>
               )}
-              {key === 'topSideL' && (
-                <g transform={`translate(${p.w}, 0) scale(-1, 1)`}>
-                  <TopSideWall w={p.w} h={p.h} product={product} side="L" />
-                </g>
-              )}
-              {key === 'topSideR' && (
-                <g transform={`translate(${p.w}, 0) scale(-1, 1)`}>
-                  <TopSideWall w={p.w} h={p.h} product={product} side="R" />
-                </g>
-              )}
+              {key === 'topSideL' && <TopSideWall w={p.w} h={p.h} product={product} side="L" />}
+              {key === 'topSideR' && <TopSideWall w={p.w} h={p.h} product={product} side="R" />}
               {key === 'topFront' && <TopFrontWall w={p.w} h={p.h} product={product} />}
             </g>
           </g>
