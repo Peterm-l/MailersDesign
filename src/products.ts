@@ -63,7 +63,7 @@ export const TEXT_SLOT_DEFAULTS: Record<TextSlotId, string> = {
   botFaceHeader: 'HOW TO CONNECT',
   botFaceTitle: 'Up and running in under 5 minutes.',
   botFaceModelLabel: 'MODEL',
-  botFaceFccLabel: 'FCC ID',
+  botFaceFccLabel: 'FCC ID CONTAINS',
   botFaceInputLabel: 'INPUT',
   botFaceInputValue: 'USB-C · 5V⎓500mA',
   botFaceOrigin: 'ASSEMBLED & DESIGNED IN USA',
