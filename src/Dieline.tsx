@@ -535,12 +535,16 @@ function TopSideWall({ w, h, product, side }: { w: number; h: number; product: P
   const showQr = !!qr?.enabled && !!qr?.panels?.[side === 'L' ? 'topSideL' : 'topSideR'];
   const qrSize = Math.min(w - pad * 2, 58);
   const pos = Math.max(0, Math.min(100, qr?.position ?? 50)) / 100;
-  const qrX = (h - qrSize) * (1 - pos);
-  const qrY = (w - qrSize) / 2;
   // Left side reads top-to-bottom (rotate +90); right side keeps the
   // original bottom-to-top direction (rotate -90). No scaleX — that
   // would mirror the glyphs.
   const rotateDir = side === 'L' ? 90 : -90;
+  // The +90 vs -90 rotation flips which end of the inner x-axis maps
+  // to the top of the panel on the flat dieline, so invert the QR
+  // placement for the left side so the slider (0 = top, 100 = bottom)
+  // moves in the same direction on both panels.
+  const qrX = (h - qrSize) * (side === 'L' ? pos : 1 - pos);
+  const qrY = (w - qrSize) / 2;
 
   // With rotate(+90) on the left side the rotated x axis is reversed
   // from the right side, so we swap which slot lands near the top of
