@@ -60,7 +60,9 @@ const c = {
   bg: '#0a0a0b', border: '#2a2a30',
   accent: '#c8ff00', accentDim: 'rgba(200,255,0,0.08)',
   pink: '#ff4d9e',
-  text: '#e8e8ec', textDim: '#8b8b96', textMuted: '#5a5a65',
+  // Brightened from #8b8b96 / #5a5a65 for printability on dark panels —
+  // darker grays tend to plug up under ink dot gain on press.
+  text: '#e8e8ec', textDim: '#b8b8c0', textMuted: '#9090a0',
   white: '#ffffff', kraft: '#f4f1e8', kraftEdge: '#e0dcc7',
   cutLine: '#ff4d6a',
 };
