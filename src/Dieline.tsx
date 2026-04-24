@@ -607,7 +607,7 @@ function SinglePanel({ panel, product, accentStyle, productImage, bgColor, glowI
       case 'botLongTop': return <LongWall w={W} h={H} product={product} variant="brand" />;
       case 'botLongBot': return <LongWall w={W} h={H} product={product} variant="tagline" flip />;
       case 'botShortL':  return <ShortWall w={W} h={H} product={product} rotateDir={-90} side="L" />;
-      case 'botShortR':  return <ShortWall w={W} h={H} product={product} rotateDir={90} side="R" />;
+      case 'botShortR':  return <ShortWall w={W} h={H} product={product} rotateDir={-90} side="R" />;
       case 'topSideL':   return <TopSideWall w={W} h={H} product={product} side="L" />;
       case 'topSideR':   return <TopSideWall w={W} h={H} product={product} side="R" />;
       case 'topFront':   return <TopFrontWall w={W} h={H} product={product} />;
@@ -667,7 +667,7 @@ export function Dieline({ product, accentStyle = 'spectrum', productImage, bgCol
               {key === 'botLongTop' && <LongWall w={p.w} h={p.h} product={product} variant="brand" />}
               {key === 'botLongBot' && <LongWall w={p.w} h={p.h} product={product} variant="tagline" flip />}
               {key === 'botShortL' && <ShortWall w={p.w} h={p.h} product={product} rotateDir={-90} side="L" />}
-              {key === 'botShortR' && <ShortWall w={p.w} h={p.h} product={product} rotateDir={90} side="R" />}
+              {key === 'botShortR' && <ShortWall w={p.w} h={p.h} product={product} rotateDir={-90} side="R" />}
               {key === 'topSideL' && <TopSideWall w={p.w} h={p.h} product={product} side="L" />}
               {key === 'topSideR' && <TopSideWall w={p.w} h={p.h} product={product} side="R" />}
               {key === 'topFront' && <TopFrontWall w={p.w} h={p.h} product={product} />}
