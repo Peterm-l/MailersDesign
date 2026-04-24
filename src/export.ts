@@ -36,6 +36,20 @@ export async function rasterizeSvgToPng(
   clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
   clone.setAttribute('width', String(w));
   clone.setAttribute('height', String(h));
+
+  // Bake a background rect into the SVG itself as the first child so
+  // every transparent area renders as bg in the exported PNG — this is
+  // more reliable than relying on the canvas fill behind drawImage.
+  if (backgroundColor) {
+    const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bgRect.setAttribute('x', '0');
+    bgRect.setAttribute('y', '0');
+    bgRect.setAttribute('width', String(w));
+    bgRect.setAttribute('height', String(h));
+    bgRect.setAttribute('fill', backgroundColor);
+    clone.insertBefore(bgRect, clone.firstChild);
+  }
+
   await inlineImagesInSvg(clone);
 
   const xml = new XMLSerializer().serializeToString(clone);
