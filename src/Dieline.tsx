@@ -511,7 +511,7 @@ function ShortWall({ w, h, product, rotateDir = -90, side }: { w: number; h: num
   // flip positions for the right side to keep SKU at the top and
   // product name at the bottom on both sides.
   const pos = Math.max(0, Math.min(100, qr?.position ?? 50)) / 100;
-  const qrX = (h - qrSize) * (side === 'R' ? pos : 1 - pos);
+  const qrX = (h - qrSize) * (1 - pos);
   const qrY = (w - qrSize) / 2;
 
   const nameX = side === 'L' ? pad : h - pad;
