@@ -138,7 +138,7 @@ export const DEFAULT_PRODUCTS: Product[] = [
     key: 'analyzer',
     name: 'Vibration Analyzer',
     sku: 'GV-VA-01',
-    tagline: 'REAL-TIME FFT SPECTRUM · NO LAPTOP REQUIRED',
+    tagline: 'real-time fft spectrum · no laptop required',
     fcc: '',
     connect: [
       { n: '01', title: 'Mount',   body: 'Magnet sensor to machine housing near bearing.' },
@@ -157,7 +157,7 @@ export const DEFAULT_PRODUCTS: Product[] = [
     key: 'balancer',
     name: 'Spindle Balancer',
     sku: 'GV-SB-01',
-    tagline: 'AUTO-BALANCING · UP TO 60,000 RPM',
+    tagline: 'auto-balancing · up to 60,000 rpm',
     fcc: '',
     connect: [
       { n: '01', title: 'Mount',   body: 'Magnet to spindle housing. Apply tape to shaft.' },

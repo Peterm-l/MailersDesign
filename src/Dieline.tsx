@@ -312,7 +312,7 @@ function TopFace({ w, h, product, accentStyle, productImage, glowIntensity = 28,
       <text x={pad + 8} y={pad + 110} fill={c.text} fontFamily={FONT_DISPLAY} fontSize="44" fontWeight="800" letterSpacing="-2.2">{first}</text>
       <text x={pad + 8} y={pad + 152} fill={c.accent} fontFamily={FONT_DISPLAY} fontSize="44" fontWeight="800" letterSpacing="-2.2">{rest}.</text>
 
-      <text x={pad + 8} y={pad + 182} fill={c.textDim} fontFamily={FONT_BODY} fontSize="11" fontWeight="400">{product.tagline.toLowerCase()}</text>
+      <text x={pad + 8} y={pad + 182} fill={c.textDim} fontFamily={FONT_BODY} fontSize="11" fontWeight="400">{product.tagline}</text>
 
       {productImage && product.showProductImage !== false && (
         <image href={productImage} x={pad + 40} y={pad + 210} width={w - pad * 2 - 80} height={h - pad - 300} preserveAspectRatio="xMidYMid meet" opacity="0.96" />
