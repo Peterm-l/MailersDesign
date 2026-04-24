@@ -506,20 +506,25 @@ function ShortWall({ w, h, product, rotateDir = -90, side }: { w: number; h: num
   const qr = product.qrCode;
   const showQr = !!qr?.enabled && !!qr?.panels?.[side === 'L' ? 'botShortL' : 'botShortR'];
   const qrSize = Math.min(w - pad * 2, 58);
-  // Panel is rotated -90° so increasing qrX moves UP on the flat dieline.
-  // The right-side scaleX(-1) wrapper flips horizontally only, so vertical
-  // position is shared — same formula on both sides keeps the QRs aligned.
-  // Slider: 0 = top of panel on dieline, 100 = bottom.
+  // L uses rotate(-90), R uses rotate(+90). Those two rotations map
+  // inner-x to opposite ends of the panel on the flat dieline, so we
+  // flip positions for the right side to keep SKU at the top and
+  // product name at the bottom on both sides.
   const pos = Math.max(0, Math.min(100, qr?.position ?? 50)) / 100;
-  const qrX = (h - qrSize) * (1 - pos);
+  const qrX = (h - qrSize) * (side === 'R' ? pos : 1 - pos);
   const qrY = (w - qrSize) / 2;
+
+  const nameX = side === 'L' ? pad : h - pad;
+  const skuX = side === 'L' ? h - pad : pad;
+  const nameAnchor: 'start' | 'end' = side === 'L' ? 'start' : 'end';
+  const skuAnchor: 'start' | 'end' = side === 'L' ? 'end' : 'start';
 
   return (
     <g transform={`translate(${w / 2}, ${h / 2}) rotate(${rotateDir}) translate(${-h / 2}, ${-w / 2})`}>
-      <Mono x={pad} y={w / 2 + 3} size={7.5} ls={1.4} color={c.accent} weight={500}>
+      <Mono x={nameX} y={w / 2 + 3} size={7.5} ls={1.4} color={c.accent} weight={500} anchor={nameAnchor}>
         {product.name.toUpperCase()}
       </Mono>
-      <Mono x={h - pad} y={w / 2 + 3} anchor="end" size={7.5} ls={1.4} color={c.textDim}>
+      <Mono x={skuX} y={w / 2 + 3} anchor={skuAnchor} size={7.5} ls={1.4} color={c.textDim}>
         {product.sku}
       </Mono>
       {showQr && <QrBlock x={qrX} y={qrY} size={qrSize} enabled data={qr.data} />}
